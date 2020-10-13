@@ -16,6 +16,7 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             'Bóng đá' => [
+                'Việt Nam',
                 'Anh',
                 'Tây Ban Nha',
                 'Đức',
@@ -23,8 +24,11 @@ class CategorySeeder extends Seeder
                 'Pháp',
                 'C1',
                 'C2',
+                // 'Euro',
+                // 'World cup',
                 'Các giải khác',
             ],
+            'Chuyển nhượng',
             'Thể thao' => [
                 'Quần vợt',
                 'Golf',
@@ -33,11 +37,14 @@ class CategorySeeder extends Seeder
                 'Các môn khác',
             ],
             'E-sports' => [
-                'LoL',
-                'Fifa online 4',
-                'PUBG',
+                'LoL', // thethao247
+                'Fifa online 4', // ??
+                'PUBG', // gamek, game8v
                 'CSGO',
+                'Mobile' //gamek, game8v
             ],
+            'Khác',
+            'Video',
         ];
         $this->create_category($categories);
     }

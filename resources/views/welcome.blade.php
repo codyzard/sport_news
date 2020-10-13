@@ -19,6 +19,7 @@
                 font-family: 'Nunito';
             }
         </style>
+        <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
     </head>
     <body class="antialiased">
         <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center sm:pt-0">
@@ -128,5 +129,9 @@
                 </div>
             </div>
         </div>
+        <textarea class="form-control" id="summary-ckeditor" name="summary-ckeditor"></textarea>
     </body>
+    <script>
+        CKEDITOR.replace( 'summary-ckeditor' );
+    </script>
 </html>

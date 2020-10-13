@@ -42,11 +42,11 @@ class News extends Model
     }
 
     public function categories(){
-        return $this->belongsToMany('App\Models\Category', 'categories_news', 'news_id', 'category_id');
+        return $this->belongsToMany('App\Models\Category', 'category_news', 'news_id', 'category_id');
     }
 
     public function tags(){
-        return $this->belongsToMany('App\Models\Tag', 'tags_news', 'news_id', 'tag_id');
+        return $this->belongsToMany('App\Models\Tag', 'tag_news', 'news_id', 'tag_id');
     }
 
 }
