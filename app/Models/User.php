@@ -17,9 +17,10 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name',
         'email',
         'password',
+        'google_id',
+        'role',
     ];
 
     /**
@@ -40,4 +41,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    public function user_info(){
+        return $this->hasOne('App\Models\UserInfo');
+    }
 }
