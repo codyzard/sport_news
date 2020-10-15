@@ -17,9 +17,11 @@ class TheThao
     private $service_url = 'http://127.0.0.1:5000/';
     public function scrape()
     {
-        $this->soccer_crawler();
-        echo PHP_EOL . '-------------------------------------' . PHP_EOL;
-        $this->sport_crawler();
+        // $this->soccer_crawler();
+        // echo PHP_EOL . '-------------------------------------' . PHP_EOL;
+        // $this->sport_crawler();
+        // echo PHP_EOL . '-------------------------------------' . PHP_EOL;
+        $this->esport_LoL_crawler();
     }
 
     public function soccer_crawler()
@@ -130,6 +132,7 @@ class TheThao
                                     }
                                 }
                                 $GLOBALS['tag'] = [];
+                                $GLOBALS['categories'] = [];
                             }
                         );
                     }
@@ -156,6 +159,9 @@ class TheThao
             $crawler->filter('#cate-5 a')->each(
                 function (Crawler $node) {
                     $href = $node->attr('href');
+                    $skip_cateNULL = ['Nhân vật & Sự kiện', 'Chạy bộ'];
+                    if( in_array($node->text(), $skip_cateNULL))    return;
+
                     $GLOBALS['categories'] = array(Category::where('name', '=', 'Thể thao')->first()->id); // create arr category
 
                     // kiểm tra loại cate nào
@@ -246,12 +252,103 @@ class TheThao
                                 }
                             }
                             $GLOBALS['tag'] = [];
+                            $GLOBALS['categories'] =[];
                         }
                     );
                 }
             );
         } catch (Exception $e) {
             echo 'Caught exception: ',  $e->getMessage(), "\n";
+        }
+    }
+
+    public function esport_LoL_crawler(){
+        try{
+            $client = new Client();
+
+            $crawler = $client->request('GET', 'https://thethao247.vn/lien-minh-huyen-thoai-c181/');
+            $GLOBALS['categories'] = array(Category::where(['name' => 'LoL'])->first()->id, Category::where(['name' => 'E-sports'])->first()->id);
+            $crawler->filter('ul.list_newest li')->each(
+                function (Crawler $node) {
+                    $title_img = $node->filter('img')->attr('src');
+                    $detail_href = $node->filter('h3 a')->attr('href');
+                    $detail_client = new Client();
+                    $detail_crawler = $detail_client->request('GET', $detail_href);
+
+                    $title = $detail_crawler->filter('div.colcontent h1')->text();
+                    $summary = $detail_crawler->filter('div.colcontent p.typo_news_detail')->text();
+
+                    // Tag
+                    $GLOBALS['tag'] = [];
+                    $detail_crawler->filter('div.tags_article a')->each(function (Crawler $node) {
+                        $get_tag = Tag::where(['name' => $node->text()])->first();
+                        if (!$get_tag) {
+                            $get_tag = Tag::create(['name' => $node->text()]);
+                        }
+                        array_push($GLOBALS['tag'], $get_tag->id);
+                    });
+                    // image
+                    $GLOBALS['images'] = [];
+                    $detail_crawler->filter('figure')->each(function (Crawler $node) {
+                        $image = Image::create([
+                            'src' => $node->filter('a img')->attr('src'),
+                            'description' => $node->filter('figcaption')->count() > 0 ? $node->filter('figcaption')->text() : "",
+                        ]);
+                        array_push($GLOBALS['images'], $image);
+                    });
+                    //set publish_date
+                    $datetime = $detail_crawler->filter('p.ptimezone.fregular')->text();
+                    // $datetime = trim(str_replace(['(GMT+7)'], '', $datetime)); // convert (GMT)-> GMT
+                    $datetime = substr($datetime, 0, 19);
+                    //news
+                    $content = $detail_crawler->filter('#main-detail p')->each(function (Crawler $node) {
+                        if ($node->children()->count() == 0) return '<p>' . $node->text() . '</p>';
+                        // if($node->children()->count() == 0) return $node->text();
+                    });
+                    $content = implode(' ', $content);
+                    $db_content_monthDay = Category::where(['name' => 'LoL'])->first()->news()->get()->pluck('content');
+                    // ->whereBetween('date_publish',[now()->subYear(1),now()])->pluck('content');
+
+                    if ($db_content_monthDay->count() != 0) {
+                        $request_servce = Http::post($this->service_url . '/check_similarity', [
+                            'from_db' => $db_content_monthDay,
+                            'data_check' => $content,
+                        ]);
+                        if (!boolval($request_servce->body()) && trim($content) != "") {
+                            $news = new News;
+                            $news->title = $title;
+                            $news->title_img = $title_img;
+                            $news->summary = $summary;
+                            $news->content = $content;
+                            $news->date_publish = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
+                            $news->status = 1;
+                            $news->save();
+                            $news->tags()->attach($GLOBALS['tag']);
+                            $news->images()->saveMany($GLOBALS['images']);
+                            $news->categories()->attach($GLOBALS['categories']);
+                        }
+                        echo $request_servce->body();
+                    } else {
+                        if (trim($content) != "") {
+                            $news = new News;
+                            $news->title = $title;
+                            $news->title_img = $title_img;
+                            $news->summary = $summary;
+                            $news->content = $content;
+                            $news->date_publish = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
+                            $news->status = 1;
+                            $news->save();
+                            $news->tags()->attach($GLOBALS['tag']);
+                            $news->images()->saveMany($GLOBALS['images']);
+                            $news->categories()->attach($GLOBALS['categories']);
+                        }
+                    }
+                    $GLOBALS['tag'] = [];
+                }
+            );
+
+        }catch(Exception $e){
+            echo $e->getMessage();
         }
     }
 }

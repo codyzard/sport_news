@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helper\CrawlerHelper;
 use App\Scraper\TheThao;
 use Illuminate\Console\Command;
 
@@ -40,5 +41,6 @@ class ScrapeCommand extends Command
     {
         $check = new TheThao;
         $check->scrape();
+        CrawlerHelper::clean_image_trash();
     }
 }

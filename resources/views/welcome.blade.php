@@ -129,6 +129,8 @@
                 </div>
             </div>
         </div>
+        <div class="videomclWrapper"><!--Copy & Pasted from MeCloud--> <iframe allowfullscreen="" mozallowfullscreen="" msallowfullscreen="" oallowfullscreen="" webkitallowfullscreen="" src="https://embed.videocloud.top/iframe/qe5zqaQWTf" width="560" height="345" frameborder="0" scrolling="no"></iframe></div>
+
         <textarea class="form-control" id="summary-ckeditor" name="summary-ckeditor"></textarea>
     </body>
     <script>
