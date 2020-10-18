@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Helper\CrawlerHelper;
+use App\Scraper\Bongdacomvn;
 use App\Scraper\TheThao;
 use Illuminate\Console\Command;
 
@@ -39,8 +40,10 @@ class ScrapeCommand extends Command
      */
     public function handle()
     {
-        $check = new TheThao;
-        $check->scrape();
+        $thethao = new TheThao;
+        $bongda = new Bongdacomvn;
+        $thethao->scrape();
+        $bongda->scrape();
         CrawlerHelper::clean_image_trash();
     }
 }

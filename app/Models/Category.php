@@ -26,6 +26,6 @@ class Category extends Model
     }
 
     public function news(){
-        return $this->belongsToMany('App\Models\News', 'category_news', 'category_id', 'news_id');
+        return $this->belongsToMany('App\Models\News', 'categories_news', 'category_id', 'news_id');
     }
 }

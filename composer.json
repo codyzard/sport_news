@@ -9,9 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.3",
-        "ckfinder/ckfinder-laravel-package": "v3.5.1.6",
         "cviebrock/eloquent-sluggable": "^8.0",
-        "fabpot/goutte": "^4.0",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
