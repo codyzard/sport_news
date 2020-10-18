@@ -73,29 +73,30 @@ class Bongdacomvn{
                         });
 
                         //get img content
-
+                        $GLOBALS['had_news_image'] = false;
                         $GLOBALS['images'] = [];
                         $detail_crawler->filter('#content_detail figure')->each(function (Crawler $node) {
                             $src = $node->filter('img')->attr('src');
-                            if(Image::where('src', '=', $src)->first() === null){
+                            if(Image::where(['src' => $src])->first() == null){
                                 $image = Image::create([
                                     'src' => $node->filter('img')->attr('src'),
                                     'description' =>  $node->filter('figcaption')->text(),
                                 ]);
+
                                 array_push($GLOBALS['images'], $image);
                             }
                             else{
                                 $GLOBALS['had_news_image'] = true; //bug cho anh
+                                $GLOBALS['images'] = [];
                                 return;
                             }
 
                         });
 
                         $content = $detail_crawler->filter('#content_detail p')->each(function (Crawler $node) {
-                            if ($node->children()->count() == 0) return '<p>' . $node->text() . '</p>';
+                            return '<p>' . $node->text() . '</p>';
                         });
                         $content = implode(' ', $content);
-                        dd($category);
                         $db_content_monthDay = Category::where(['name' => $category])->first()->news()->get()
                         ->whereBetween('date_publish', [now()->subMonths($timeCheck), now()->addDay()])->pluck('content');
 
@@ -104,7 +105,7 @@ class Bongdacomvn{
                                 'from_db' => $db_content_monthDay,
                                 'data_check' => $content,
                             ]);
-                            if ((!boolval($request_servce->body()) && trim($content) != "" ) || (empty($GLOBALS['images'] && $GLOBALS['had_news_image'] === false ))) {
+                            if (( !boolval($request_servce->body()) && trim($content) != "" )|| (empty($GLOBALS['images'] && $GLOBALS['had_news_image'] === false ))) {
                                 $news = new News;
                                 $news->title = $title;
                                 $news->title_img = $title_img;
@@ -119,8 +120,7 @@ class Bongdacomvn{
                             }
                             echo $request_servce->body();
                         } else {
-                            if (trim($content) != "" || (!empty($GLOBALS['images'] &&  $GLOBALS['had_news_image'] === false))) {
-                                dd('?');
+                            if (trim($content) != "" || ($GLOBALS['had_news_image'] === false)) {
                                 $news = new News;
                                 $news->title = $title;
                                 $news->title_img = $title_img;

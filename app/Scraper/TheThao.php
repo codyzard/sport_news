@@ -10,17 +10,22 @@ use Symfony\Component\DomCrawler\Crawler;
 use App\Models\News;
 use App\Models\Tag;
 use Exception;
+use Illuminate\Support\Facades\Config;
 
 class TheThao
 {
     private $main_url = 'https://thethao247.vn/';
-    private $service_url = 'http://127.0.0.1:5000/';
+    private $service_url = null;
+    public function __construct()
+    {
+        $this->service_url = Config::get('app._SERVICE_URL');
+    }
     public function scrape()
     {
-        // $this->soccer_crawler();
-        // echo PHP_EOL . '-------------------------------------' . PHP_EOL;
-        // $this->sport_crawler();
-        // echo PHP_EOL . '-------------------------------------' . PHP_EOL;
+        $this->soccer_crawler();
+        echo PHP_EOL . '-------------------------------------' . PHP_EOL;
+        $this->sport_crawler();
+        echo PHP_EOL . '-------------------------------------' . PHP_EOL;
         $this->esport_LoL_crawler();
     }
 
@@ -87,6 +92,7 @@ class TheThao
                                 $datetime = $detail_crawler->filter('p.ptimezone.fregular')->text();
                                 // $datetime = trim(str_replace(['(GMT+7)'], '', $datetime)); // convert (GMT)-> GMT
                                 $datetime = substr($datetime, 0, 19);
+                                $datetime = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
                                 //news
                                 $content = $detail_crawler->filter('#main-detail p')->each(function (Crawler $node) {
                                     if ($node->children()->count() == 0) return '<p>' . $node->text() . '</p>';
@@ -108,7 +114,7 @@ class TheThao
                                         $news->title_img = $title_img;
                                         $news->summary = $summary;
                                         $news->content = $content;
-                                        $news->date_publish = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
+                                        $news->date_publish = $datetime;
                                         $news->status = 1;
                                         $news->save();
                                         $news->tags()->attach($GLOBALS['tag']);
@@ -123,7 +129,7 @@ class TheThao
                                         $news->title_img = $title_img;
                                         $news->summary = $summary;
                                         $news->content = $content;
-                                        $news->date_publish = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
+                                        $news->date_publish = $datetime;
                                         $news->status = 1;
                                         $news->save();
                                         $news->tags()->attach($GLOBALS['tag']);

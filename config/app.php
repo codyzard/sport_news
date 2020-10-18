@@ -229,5 +229,5 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
     ],
-
+    '_SERVICE_URL' => 'http://127.0.0.1:5000',
 ];
