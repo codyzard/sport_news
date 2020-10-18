@@ -40,7 +40,6 @@ class Bongdacomvn{
             $client = new Client();
             $crawler = $client->request('GET', $url);
             $each_crawler = $crawler->filter('.list_top_news.list_news_cate li');
-
             if($each_crawler->count() > 0){
                 $GLOBALS['categories'] = [];
                 array_push(
@@ -57,7 +56,6 @@ class Bongdacomvn{
                         $detail_href = $node->filter('h2 a')->attr('href');
                         $detail_client = new Client();
                         $detail_crawler = $detail_client->request('GET', $detail_href);
-
 
                         // get datetime content
 
@@ -97,8 +95,10 @@ class Bongdacomvn{
                             if ($node->children()->count() == 0) return '<p>' . $node->text() . '</p>';
                         });
                         $content = implode(' ', $content);
+                        dd($category);
                         $db_content_monthDay = Category::where(['name' => $category])->first()->news()->get()
                         ->whereBetween('date_publish', [now()->subMonths($timeCheck), now()->addDay()])->pluck('content');
+
                         if ($db_content_monthDay->count() != 0) {
                             $request_servce = Http::post($this->service_url . '/check_similarity', [
                                 'from_db' => $db_content_monthDay,

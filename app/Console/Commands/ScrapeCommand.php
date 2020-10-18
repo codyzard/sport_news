@@ -42,7 +42,7 @@ class ScrapeCommand extends Command
     {
         $thethao = new TheThao;
         $bongda = new Bongdacomvn;
-        $thethao->scrape();
+        // $thethao->scrape();
         $bongda->scrape();
         CrawlerHelper::clean_image_trash();
     }
