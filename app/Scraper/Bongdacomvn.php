@@ -13,7 +13,6 @@ use App\Models\Tag;
 use Exception;
 
 class Bongdacomvn{
-    private $main_url = 'https://thethao247.vn/';
     private $service_url = null;
 
     public function __construct()
@@ -30,8 +29,8 @@ class Bongdacomvn{
         $this->soccer($cate_soccer, 'Pháp', 'http://www.bongda.com.vn/bong-da-phap/', 1);
         $this->soccer($cate_soccer, 'C1', 'http://www.bongda.com.vn/champions-league/', 4);
         $this->soccer($cate_soccer, 'C2', 'http://www.bongda.com.vn/europa-league/', 4);
-        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/euro-2020/', 6);
-        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/bong-da-chau-au/', 3);
+        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/euro-2020/', 12);
+        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/bong-da-chau-au/', 4);
         $this->soccer($cate_soccer, 'Chuyển nhượng', 'http://www.bongda.com.vn/tin-chuyen-nhuong/', 1);
     }
     public function soccer($parent_category, $category, $url, $timeCheck){
@@ -77,22 +76,23 @@ class Bongdacomvn{
                         $GLOBALS['images'] = [];
                         $detail_crawler->filter('#content_detail figure')->each(function (Crawler $node) {
                             $src = $node->filter('img')->attr('src');
-                            if(Image::where(['src' => $src])->first() == null){
-                                $image = Image::create([
-                                    'src' => $node->filter('img')->attr('src'),
-                                    'description' =>  $node->filter('figcaption')->text(),
-                                ]);
-
-                                array_push($GLOBALS['images'], $image);
-                            }
+                            if($GLOBALS['had_news_image'] === true) return;
                             else{
-                                $GLOBALS['had_news_image'] = true; //bug cho anh
-                                $GLOBALS['images'] = [];
-                                return;
+                                if(Image::where(['src' => $src])->first() === null){
+                                    $image = Image::create([
+                                        'src' => $node->filter('img')->attr('src'),
+                                        'description' =>  $node->filter('figcaption')->text(),
+                                    ]);
+    
+                                    array_push($GLOBALS['images'], $image);
+                                }
+                                else{
+                                    $GLOBALS['had_news_image'] = true; //bug cho anh
+                                    $GLOBALS['images'] = [];
+                                    return;
+                                }
                             }
-
                         });
-
                         $content = $detail_crawler->filter('#content_detail p')->each(function (Crawler $node) {
                             return '<p>' . $node->text() . '</p>';
                         });
@@ -100,12 +100,12 @@ class Bongdacomvn{
                         $db_content_monthDay = Category::where(['name' => $category])->first()->news()->get()
                         ->whereBetween('date_publish', [now()->subMonths($timeCheck), now()->addDay()])->pluck('content');
 
-                        if ($db_content_monthDay->count() != 0) {
+                        if ($db_content_monthDay->count() > 0) {
                             $request_servce = Http::post($this->service_url . '/check_similarity', [
                                 'from_db' => $db_content_monthDay,
                                 'data_check' => $content,
                             ]);
-                            if (( !boolval($request_servce->body()) && trim($content) != "" )|| (empty($GLOBALS['images'] && $GLOBALS['had_news_image'] === false ))) {
+                            if ((!boolval($request_servce->body()) && trim($content) != "" ) || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false )) {
                                 $news = new News;
                                 $news->title = $title;
                                 $news->title_img = $title_img;
@@ -120,7 +120,7 @@ class Bongdacomvn{
                             }
                             echo $request_servce->body();
                         } else {
-                            if (trim($content) != "" || ($GLOBALS['had_news_image'] === false)) {
+                            if (trim($content) != "" || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false )) {
                                 $news = new News;
                                 $news->title = $title;
                                 $news->title_img = $title_img;

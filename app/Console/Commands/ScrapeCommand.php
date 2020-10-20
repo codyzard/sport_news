@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use App\Helper\CrawlerHelper;
 use App\Scraper\Bongdacomvn;
+use App\Scraper\Fo4;
 use App\Scraper\TheThao;
+use App\Scraper\Vikinggg;
 use Illuminate\Console\Command;
 
 class ScrapeCommand extends Command
@@ -42,8 +44,12 @@ class ScrapeCommand extends Command
     {
         $thethao = new TheThao;
         $bongda = new Bongdacomvn;
+        $fo4 = new Fo4;
+        $vikinggg = new Vikinggg;
         // $thethao->scrape();
-        $bongda->scrape();
+        // $bongda->scrape();
+        // $fo4->scrape();
+        $vikinggg->scrape();
         CrawlerHelper::clean_image_trash();
     }
 }
