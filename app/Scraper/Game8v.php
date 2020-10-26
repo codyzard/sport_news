@@ -23,10 +23,10 @@ class Game8v{
     
     public function scrape()
     {   
-        $this->crawler('http://game8.vn/tin-game/pubg/31415');
+        $this->crawler('http://game8.vn/tin-game/pubg/31415', 'PUBG', 12);
     }
     
-    public function crawler($url){
+    public function crawler($url, $category, $timeCheck){
         try{
             $client = new Client();
             $crawler = $client->request('GET', $url);
@@ -36,37 +36,36 @@ class Game8v{
                 Category::where(['name' => 'E-sports'])->first()->id,
                 Category::where(['name' => 'PUBG'])->first()->id,
             );
-            $each_crawler = $crawler->filter('.news');
+            $each_crawler = $crawler->filter('.sub-list article');
             if($each_crawler->count() > 0){
                 $each_crawler->each(
-                    function(Crawler $node){
+                    function(Crawler $node) use ($category, $timeCheck){
                         if ($node->filter('img')->count() <= 0 ) return;
                         else{
                             $title_img = $node->filter('img')->attr('src');
-                            $title =  $node->filter('h5')->text();
-                            $summary = $node->filter('div .new-caption')->text();
-                            $detail_href = $node->filter('h5 a')->attr('href');
+                            $title =  $node->filter('.col-xs-8 h2')->text();
+                            $summary = $node->filter('.col-xs-8 p')->text();
+                            $detail_href = $node->filter('.col-xs-8 h2 a')->attr('href');
                             $detail_client = new Client();
                             $detail_crawler = $detail_client->request('GET', $detail_href);
     
                             // get datetime content
                             
                             // xóa ký tự 'h' và -''
-                            $datetime = str_replace('-', '', str_replace('h', ':', trim(($detail_crawler->filter('div.time-new'))->text())));
-                            $datetime = now()->createFromFormat('H:i d/m/Y', $datetime, 'GMT+7');
-                            // $datetime = now()->createFromFormat('H:i d/m/Y', $datetime, 'GMT+7');
+                            $datetime = $detail_crawler->filter('.date span')->last()->text();
+                            $datetime = now()->createFromFormat('d/m/Y H:i', $datetime, 'GMT+7');
     
                             //get img content
                             $GLOBALS['had_news_image'] = false;
                             $GLOBALS['images'] = [];
-                            $detail_crawler->filter('.content-detail-news img')->each(function (Crawler $node) {
+                            $detail_crawler->filter('.content-detail p img')->each(function (Crawler $node) {
                                 $src = $node->attr('src');
                                 if($GLOBALS['had_news_image'] === true) return;
                                 else{
                                     if(Image::where(['src' => $src])->first() === null){
                                         $image = Image::create([
                                             'src' => $node->attr('src'),
-                                            'description' =>  'Fifa online 4',
+                                            'description' =>  'PUBG',
                                         ]);
         
                                         array_push($GLOBALS['images'], $image);
@@ -78,12 +77,14 @@ class Game8v{
                                     }
                                 }
                             });
-                            $content = $detail_crawler->filter('.content-detail-news p')->each(function (Crawler $node) {
-                                return '<p>' . $node->text() . '</p>';
+                            $content = $detail_crawler->filter('.content-detail p')->each(function (Crawler $node) {
+                               
+                              return '<p>' . $node->text() . '</p>';
                             });
                             $content = implode(' ', $content);
-                            $db_content_monthDay = Category::where(['name' => 'Fifa online 4'])->first()->news()->get()
-                            ->whereBetween('date_publish', [now()->subMonths(1), now()->addDay()])->pluck('content');
+                            $content = substr($content, 120);
+                            $db_content_monthDay = Category::where(['name' => $category])->first()->news()->get()
+                            ->whereBetween('date_publish', [now()->subMonths($timeCheck), now()->addDay()])->pluck('content');
                             if ($db_content_monthDay->count() > 0) {
                                 $request_servce = Http::post($this->service_url . '/check_similarity', [
                                     'from_db' => $db_content_monthDay,
