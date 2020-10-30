@@ -21,10 +21,12 @@ class CreateCategoryNewsTable extends Migration
 
             $table->foreign('category_id')
                     ->references('id')
-                    ->on('categories');
+                    ->on('categories')
+                    ->onDelete('cascade');
             $table->foreign('news_id')
                     ->references('id')
-                    ->on('news');
+                    ->on('news')
+                    ->onDelete('cascade');
             $table ->unique(array('category_id', 'news_id'));
         });
     }

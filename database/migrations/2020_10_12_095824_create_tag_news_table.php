@@ -21,10 +21,12 @@ class CreateTagNewsTable extends Migration
 
             $table->foreign('tag_id')
                     ->references('id')
-                    ->on('tags');
+                    ->on('tags')
+                    ->onDelete('cascade');
             $table->foreign('news_id')
                     ->references('id')
-                    ->on('news');
+                    ->on('news')
+                    ->onDelete('cascade');
             $table ->unique(array('tag_id', 'news_id'));
         });
     }

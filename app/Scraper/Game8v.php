@@ -97,7 +97,9 @@ class Game8v{
                                     $news->summary = $summary;
                                     $news->content = $content;
                                     $news->date_publish = $datetime;
-                                    $news->status = 1;
+                                    $news->status = Config::get('app.STATUS_NEWS');
+                                    $news->view_count = random_int(100, 500);
+                                    $news->hot_or_nor = random_int(0,1);
                                     $news->save();
                                     $news->images()->saveMany($GLOBALS['images']);
                                     $news->categories()->attach($GLOBALS['categories']);
@@ -111,7 +113,9 @@ class Game8v{
                                     $news->summary = $summary;
                                     $news->content = $content;
                                     $news->date_publish = $datetime;
-                                    $news->status = 1;
+                                    $news->status = Config::get('app.STATUS_NEWS');
+                                    $news->view_count = random_int(100, 500);
+                                    $news->hot_or_nor = random_int(0,1);
                                     $news->save();
                                     $news->images()->saveMany($GLOBALS['images']);
                                     $news->categories()->attach($GLOBALS['categories']);

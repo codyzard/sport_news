@@ -23,7 +23,8 @@ class CreateVideosTable extends Migration
 
             $table->foreign('news_id')
                     ->references('id')
-                    ->on('news');
+                    ->on('news')
+                    ->onDelete('cascade');
         });
     }
 

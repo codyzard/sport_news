@@ -43,7 +43,7 @@ class Vikinggg
             $each_crawler = $crawler->filter('#latest_news .news-item');
             if ($each_crawler->count() > 0) {
                 $each_crawler->each(
-                    function (Crawler $node) use ($timeCheck) {
+                    function (Crawler $node) use ($category, $timeCheck) {
                         if ($node->filter('img')->count() <= 0) return;
                         else {
                             $title_img = $node->filter('img')->attr('src');
@@ -100,7 +100,7 @@ class Vikinggg
                                 return '<p>' . $node->text() . '</p>';
                             });
                             $content = implode(' ', $content);
-                            $db_content_monthDay = Category::where(['name' => 'PUBG'])->first()->news()->get()
+                            $db_content_monthDay = Category::where(['name' => $category])->first()->news()->get()
                                 ->whereBetween('date_publish', [now()->subMonths($timeCheck), now()->addDay()])->pluck('content');
                             if ($db_content_monthDay->count() > 0) {
                                 $request_servce = Http::post($this->service_url . '/check_similarity', [
@@ -114,7 +114,9 @@ class Vikinggg
                                     $news->summary = $summary;
                                     $news->content = $content;
                                     $news->date_publish = $datetime;
-                                    $news->status = 1;
+                                    $news->status = Config::get('app.STATUS_NEWS');
+                                    $news->view_count = random_int(100, 500);
+                                    $news->hot_or_nor = random_int(0,1);
                                     $news->save();
                                     $news->images()->saveMany($GLOBALS['images']);
                                     $news->categories()->attach($GLOBALS['categories']);
@@ -128,7 +130,9 @@ class Vikinggg
                                     $news->summary = $summary;
                                     $news->content = $content;
                                     $news->date_publish = $datetime;
-                                    $news->status = 1;
+                                    $news->status = Config::get('app.STATUS_NEWS');
+                                    $news->view_count = random_int(100, 500);
+                                    $news->hot_or_nor = random_int(0,1);
                                     $news->save();
                                     $news->images()->saveMany($GLOBALS['images']);
                                     $news->categories()->attach($GLOBALS['categories']);

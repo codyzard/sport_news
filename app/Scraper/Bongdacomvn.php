@@ -23,8 +23,9 @@ class Bongdacomvn{
     public function scrape(){
         $cate_soccer = 'Bóng đá';
         $this->soccer($cate_soccer, 'Việt Nam', 'http://www.bongda.com.vn/viet-nam/', 1);
+        $this->soccer($cate_soccer, 'Anh', 'http://www.bongda.com.vn/ngoai-hang-anh/', 1);
         $this->soccer($cate_soccer, 'Tây Ban Nha', 'http://www.bongda.com.vn/bong-da-tbn/', 1);
-        $this->soccer($cate_soccer, 'Đức', 'http://www.bongda.com.vn/champions-league/', 1);
+        $this->soccer($cate_soccer, 'Đức', 'http://www.bongda.com.vn/bong-da-duc/', 1);
         $this->soccer($cate_soccer, 'Ý', 'http://www.bongda.com.vn/bong-da-y/', 1);
         $this->soccer($cate_soccer, 'Pháp', 'http://www.bongda.com.vn/bong-da-phap/', 1);
         $this->soccer($cate_soccer, 'C1', 'http://www.bongda.com.vn/champions-league/', 4);
@@ -112,7 +113,8 @@ class Bongdacomvn{
                                 $news->summary = $summary;
                                 $news->content = $content;
                                 $news->date_publish = $datetime;
-                                $news->status = 1;
+                                $news->status = Config::get('app.STATUS_NEWS');;
+                                $news->view_count = random_int(100, 500);
                                 $news->save();
                                 $news->tags()->attach($GLOBALS['tag']);
                                 $news->images()->saveMany($GLOBALS['images']);
@@ -127,7 +129,8 @@ class Bongdacomvn{
                                 $news->summary = $summary;
                                 $news->content = $content;
                                 $news->date_publish = $datetime;
-                                $news->status = 1;
+                                $news->status = Config::get('app.STATUS_NEWS');;
+                                $news->view_count = random_int(100, 500);
                                 $news->save();
                                 $news->tags()->attach($GLOBALS['tag']);
                                 $news->images()->saveMany($GLOBALS['images']);
@@ -140,7 +143,6 @@ class Bongdacomvn{
                     }
                 );
             }
-            $GLOBALS['categories'] = [];
         }catch(Exception $e){
             echo 'Caught exception: ',  $e->getMessage(), "\n";
         }

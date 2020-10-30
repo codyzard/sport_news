@@ -230,4 +230,6 @@ return [
 
     ],
     '_SERVICE_URL' => 'http://127.0.0.1:5000',
+    'STATUS_NEWS' => 1,
+    '_PAGINATION_OFFSET' => 9,
 ];

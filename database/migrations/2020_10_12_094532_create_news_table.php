@@ -18,7 +18,7 @@ class CreateNewsTable extends Migration
             $table->text('title');
             $table->string('title_img');
             $table->text('summary');
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->unsignedBigInteger('view_count')->default(0);
             $table->boolean('hot_or_nor')->nullable()->default(0); // 1 hot, 0 nor
             $table->integer('status')->default(1);

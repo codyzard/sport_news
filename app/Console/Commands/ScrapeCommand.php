@@ -43,16 +43,20 @@ class ScrapeCommand extends Command
      */
     public function handle()
     {
+        //init object page crawl
         $thethao = new TheThao;
         $bongda = new Bongdacomvn;
         $fo4 = new Fo4;
         $vikinggg = new Vikinggg;
         $game8v = new Game8v;
-        $thethao->scrape();
+
+        //invoke crawl
         $bongda->scrape();
+        $thethao->scrape();
         $fo4->scrape();
         $vikinggg->scrape();
         $game8v->scrape();
+
         CrawlerHelper::clean_image_trash();
     }
 }
