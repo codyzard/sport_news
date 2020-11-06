@@ -17,22 +17,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $parent_cate = Category::where('parent_id', null)->get()->except('description');
-        $categories = array();
-        foreach($parent_cate as $p){
-            $p->sub_cate = Category::where('parent_id', $p->id)->get();
-        }
-        foreach($parent_cate as $p){
-            foreach($p->sub_cate as $sub){
-                $sub->cate_news= Category::where('name', $sub->name)
-                ->first()->news()->orderBy('date_publish', 'DESC')->limit(4)->get(
-                )->toArray();
-            }
-        }
-        return response()->json([
-            'message' => 'success',
-            'cate_news' => $parent_cate,
-        ], 200);
+        
     }
 
     /**
@@ -139,6 +124,25 @@ class CategoryController extends Controller
         return $validator;
     }
 
+    public function get_all_categories()
+    {
+        $parent_cate = Category::where('parent_id', null)->get()->except('description');
+        foreach($parent_cate as $p){
+            $p->sub_cate = Category::where('parent_id', $p->id)->get();
+        }
+        foreach($parent_cate as $p){
+            foreach($p->sub_cate as $sub){
+                $sub->cate_news= Category::where('name', $sub->name)
+                ->first()->news()->orderBy('date_publish', 'DESC')->limit(4)->get(
+                )->toArray();
+            }
+        }
+        return response()->json([
+            'message' => 'success',
+            'cate_news' => $parent_cate,
+        ], 200);
+    }
+
     public function change_cate_news(Request $request)
     {
         $category_name = $request->category_name;
@@ -178,11 +182,21 @@ class CategoryController extends Controller
         ],200); 
     }
 
-    public function news_basein_cate($name)
+    public function news_basein_cate($id)
     {   
-        $get_cate = Category::where('name', $name)->first();
-        if($get_cate) $news_basein_cate = $get_cate->news()->paginate(Config::get('app._PAGINATION_OFFSET'));
-        return response($news_basein_cate, 200);
+        $get_cate = Category::find($id);
+        if($get_cate) {
+            $full_news = $get_cate->news()->orderBy('date_publish', 'DESC')->with('categories');
+            $latest_news_basein_cate =  $get_cate->news()->orderBy('date_publish', 'DESC')
+            ->with('categories')->get()->take(Config::get('app._TAKE_OFFSET'));
+            $excluding_news_id = $latest_news_basein_cate->pluck('id');
+            $news_basein_cate =  $get_cate->news()->whereNotIn('news_id', $excluding_news_id)->orderBy('date_publish', 'DESC')
+            ->with('categories')->paginate(Config::get('app._PAGINATION_OFFSET'));
+        }
+        return response()->json([
+            'news_basein_cate' => $news_basein_cate,
+            'latest_news_basein_cate' =>$latest_news_basein_cate,
+        ], 200);
     }
 
     public function get_one_category()

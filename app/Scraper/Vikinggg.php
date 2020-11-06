@@ -73,7 +73,35 @@ class Vikinggg
                                 }
                                 array_push($GLOBALS['tag'], $get_tag->id);
                             });
-    
+
+                            $GLOBALS['tags'] = [];
+                            $detail_crawler->filter('.new-tags li a')->each(function (Crawler $node) {
+                                $get_tag = Tag::where(['name' => $node->text()])->first();
+                                if (!$get_tag) {
+                                    $get_tag = Tag::create(['name' => $node->text()]);
+                                }
+                                array_push($GLOBALS['tags'], $get_tag->id);
+                            });
+
+
+                            //set index for content and image
+                            $news_image_detect = $detail_crawler->filter('#parent-fieldname-text')->children()->each(function (Crawler $node) {
+                                $element = $node->filter('p');
+                                if ($element->count() > 0 && $element->filter('img')->count() === 0) {
+                                    return "0";
+                                } else if ($element->count() > 0 && $element->filter('img')->count() > 0) {
+                                    return "1";
+                                }
+                                return null;
+                            });
+                            $news_image_detect = array_filter($news_image_detect, function ($item) {
+                                return $item !== null;
+                            });
+
+                            $news_image_detect = implode(' ', array_values($news_image_detect));
+                            //set index for content and image
+
+
                             //get img content
                             $GLOBALS['had_news_image'] = false;
                             $GLOBALS['images'] = [];
@@ -108,36 +136,21 @@ class Vikinggg
                                     'data_check' => $content,
                                 ]);
                                 if ((!boolval($request_servce->body()) && trim($content) != "") || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false)) {
-                                    $news = new News;
-                                    $news->title = $title;
-                                    $news->title_img = $title_img;
-                                    $news->summary = $summary;
-                                    $news->content = $content;
-                                    $news->date_publish = $datetime;
-                                    $news->status = Config::get('app.STATUS_NEWS');
-                                    $news->view_count = random_int(100, 500);
-                                    $news->hot_or_nor = random_int(0,1);
-                                    $news->save();
-                                    $news->images()->saveMany($GLOBALS['images']);
-                                    $news->categories()->attach($GLOBALS['categories']);
+                                    $status = Config::get('app.STATUS_NEWS');
+                                    $view_count = random_int(100, 500);
+                                    $hot_or_nor = random_int(0, 1);
+                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
                                 }
                                 echo $request_servce->body();
                             } else {
                                 if (trim($content) != "" || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false)) {
-                                    $news = new News;
-                                    $news->title = $title;
-                                    $news->title_img = $title_img;
-                                    $news->summary = $summary;
-                                    $news->content = $content;
-                                    $news->date_publish = $datetime;
-                                    $news->status = Config::get('app.STATUS_NEWS');
-                                    $news->view_count = random_int(100, 500);
-                                    $news->hot_or_nor = random_int(0,1);
-                                    $news->save();
-                                    $news->images()->saveMany($GLOBALS['images']);
-                                    $news->categories()->attach($GLOBALS['categories']);
+                                    $status = Config::get('app.STATUS_NEWS');
+                                    $view_count = random_int(100, 500);
+                                    $hot_or_nor = random_int(0, 1);
+                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
                                 }
                             }
+                            $GLOBALS['tags'] = [];
                             $GLOBALS['images'] = [];
                             $GLOBALS['had_news_image'] = false;
                         }

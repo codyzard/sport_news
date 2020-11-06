@@ -25,6 +25,7 @@ class CreateNewsTable extends Migration
             $table->date('date_publish');
             $table->unsignedBigInteger('author_id')->nullable();
             $table->string('slug');
+            $table->string('content_image_dectect')->nullable();
             $table->timestamps();
 
             $table->foreign('author_id')

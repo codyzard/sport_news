@@ -75,15 +75,34 @@ class TheThao
                                 $summary = $detail_crawler->filter('div.colcontent p.typo_news_detail')->text();
 
                                 // Tag
-                                $GLOBALS['tag'] = [];
+                                $GLOBALS['tags'] = [];
                                 $detail_crawler->filter('div.tags_article a')->each(function (Crawler $node) {
                                     $get_tag = Tag::where(['name' => $node->text()])->first();
                                     if (!$get_tag) {
                                         $get_tag = Tag::create(['name' => $node->text()]);
                                     }
-                                    array_push($GLOBALS['tag'], $get_tag->id);
+                                    array_push($GLOBALS['tags'], $get_tag->id);
                                 });
                                 // image
+
+
+                                //set index for content and image
+                                $news_image_detect = $detail_crawler->filter('#main-detail')->children()->each(function (Crawler $node) {
+                                    if ($node->filter('p')->count() > 0) {
+                                        return "0";
+                                    } else if ($node->filter('img')->count() > 0 || $node->filter('figure')->count() > 0) {
+                                        return "1";
+                                    }
+                                    return null;
+                                });
+                                $news_image_detect = array_filter($news_image_detect, function ($item) {
+                                    return $item !== null;
+                                });
+
+                                $news_image_detect = implode(' ', array_values($news_image_detect));
+
+                                //set index for content and image
+
                                 $GLOBALS['had_news_image'] = false;
                                 $GLOBALS['images'] = [];
                                 $detail_crawler->filter('figure')->each(function (Crawler $node) {
@@ -93,7 +112,7 @@ class TheThao
                                         if (Image::where(['src' => $src])->first() === null) {
                                             $image = Image::create([
                                                 'src' => $src,
-                                                'description' => $node->filter('figcaption')->count() > 0 ? $node->filter('figcaption')->text() : "",
+                                                'description' => $node->filter('figcaption')->count() > 0 ? $node->filter('figcaption')->text() : "Thể thao 247",
                                             ]);
 
                                             array_push($GLOBALS['images'], $image);
@@ -106,18 +125,18 @@ class TheThao
                                 });
                                 //set publish_date
                                 $datetime = $detail_crawler->filter('p.ptimezone.fregular')->text();
-                                // $datetime = trim(str_replace(['(GMT+7)'], '', $datetime)); // convert (GMT)-> GMT
                                 $datetime = substr($datetime, 0, 19);
                                 $datetime = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
+
                                 //news
                                 $content = $detail_crawler->filter('#main-detail p')->each(function (Crawler $node) {
-                                    if ($node->children()->count() == 0) return '<p>' . $node->text() . '</p>';
-                                    // if($node->children()->count() == 0) return $node->text();
+                                    if ($node->children()->count() == 0 && strlen(trim($node->text())) > 2)
+                                        return '<p>' . $node->text() . '</p>';
                                 });
                                 $content = implode(' ', $content);
                                 // $db_content_thisDay = News::whereDate('created_at', '=', now()->today())->get('content');
                                 $db_content_monthDay = Category::where(['name' => 'Bóng đá'])->first()->news()->get()
-                                    ->whereBetween('date_publish', [now()->subDay(30), now()])->pluck('content');
+                                    ->whereBetween('date_publish', [now()->subYear(), now()])->pluck('content');
 
                                 if ($db_content_monthDay->count() != 0) {
                                     $request_servce = Http::post($this->service_url . '/check_similarity', [
@@ -126,40 +145,22 @@ class TheThao
                                     ]);
                                     // if ((!boolval($request_servce->body()) && trim($content) != "") || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false)) {
                                     if ((!boolval($request_servce->body()) && trim($content) != "")) {
-                                        $news = new News;
-                                        $news->title = $title;
-                                        $news->title_img = $title_img;
-                                        $news->summary = $summary;
-                                        $news->content = $content;
-                                        $news->date_publish = $datetime;
-                                        $news->status = Config::get('app.STATUS_NEWS');
-                                        $news->view_count = random_int(100, 500);
-                                        $news->hot_or_nor = random_int(0,1);
-                                        $news->save();
-                                        $news->tags()->attach($GLOBALS['tag']);
-                                        $news->images()->saveMany($GLOBALS['images']);
-                                        $news->categories()->attach($GLOBALS['categories']);
+                                        $status = Config::get('app.STATUS_NEWS');
+                                        $view_count = random_int(100, 500);
+                                        $hot_or_nor = random_int(0, 1);
+                                        News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
                                     }
                                     echo $request_servce->body();
                                 } else {
                                     // if (trim($content) != "" || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false )) {
                                     if (trim($content) != "") {
-                                        $news = new News;
-                                        $news->title = $title;
-                                        $news->title_img = $title_img;
-                                        $news->summary = $summary;
-                                        $news->content = $content;
-                                        $news->date_publish = $datetime;
-                                        $news->status = Config::get('app.STATUS_NEWS');
-                                        $news->view_count = random_int(100, 500);
-                                        $news->hot_or_nor = random_int(0,1);
-                                        $news->save();
-                                        $news->tags()->attach($GLOBALS['tag']);
-                                        $news->images()->saveMany($GLOBALS['images']);
-                                        $news->categories()->attach($GLOBALS['categories']);
+                                        $status = Config::get('app.STATUS_NEWS');
+                                        $view_count = random_int(100, 500);
+                                        $hot_or_nor = random_int(0, 1);
+                                        News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
                                     }
                                 }
-                                $GLOBALS['tag'] = [];
+                                $GLOBALS['tags'] = [];
                                 $GLOBALS['images'] = [];
                                 $GLOBALS['had_news_image'] = false;
                             }
@@ -220,23 +221,32 @@ class TheThao
                             $summary = $detail_crawler->filter('div.colcontent p.typo_news_detail')->text();
 
                             // Tag
-                            $GLOBALS['tag'] = [];
+                            $GLOBALS['tags'] = [];
                             $detail_crawler->filter('div.tags_article a')->each(function (Crawler $node) {
                                 $get_tag = Tag::where(['name' => $node->text()])->first();
                                 if (!$get_tag) {
                                     $get_tag = Tag::create(['name' => $node->text()]);
                                 }
-                                array_push($GLOBALS['tag'], $get_tag->id);
+                                array_push($GLOBALS['tags'], $get_tag->id);
                             });
-                            // image
-                            // $GLOBALS['images'] = [];
-                            // $detail_crawler->filter('figure')->each(function (Crawler $node) {
-                            //     $image = Image::create([
-                            //         'src' => $node->filter('a img')->attr('src'),
-                            //         'description' => $node->filter('figcaption')->count() > 0 ? $node->filter('figcaption')->text() : "",
-                            //     ]);
-                            //     array_push($GLOBALS['images'], $image);
-                            // });
+
+
+                            //set index for content and image
+                            $news_image_detect = $detail_crawler->filter('#main-detail')->children()->each(function (Crawler $node) {
+                                if ($node->filter('p')->count() > 0) {
+                                    return "0";
+                                } else if ($node->filter('img')->count() > 0 || $node->filter('figure')->count() > 0) {
+                                    return "1";
+                                }
+                                return null;
+                            });
+                            $news_image_detect = array_filter($news_image_detect, function ($item) {
+                                return $item !== null;
+                            });
+
+                            $news_image_detect = implode(' ', array_values($news_image_detect));
+
+                            //set index for content and image
 
                             //get img content
                             $GLOBALS['had_news_image'] = false;
@@ -248,7 +258,7 @@ class TheThao
                                     if (Image::where(['src' => $src])->first() === null) {
                                         $image = Image::create([
                                             'src' => $node->filter('img')->attr('src'),
-                                            'description' =>  $node->filter('figcaption')->count() > 0 ? $node->filter('figcaption')->text() : "",
+                                            'description' =>  $node->filter('figcaption')->count() > 0 ? $node->filter('figcaption')->text() : "Thể thao 247",
                                         ]);
 
                                         array_push($GLOBALS['images'], $image);
@@ -262,12 +272,12 @@ class TheThao
 
                             //set publish_date
                             $datetime = $detail_crawler->filter('p.ptimezone.fregular')->text();
-                            // $datetime = trim(str_replace(['(GMT+7)'], '', $datetime)); // convert (GMT)-> GMT
                             $datetime = substr($datetime, 0, 19);
+                            $datetime = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
                             //news
                             $content = $detail_crawler->filter('#main-detail p')->each(function (Crawler $node) {
-                                if ($node->children()->count() == 0) return '<p>' . $node->text() . '</p>';
-                                // if($node->children()->count() == 0) return $node->text();
+                                if ($node->children()->count() == 0 && strlen(trim($node->text())) > 2)
+                                    return '<p>' . $node->text() . '</p>';
                             });
                             $content = implode(' ', $content);
                             $db_content_monthDay = Category::where(['name' => 'Thể thao'])->first()->news()->get()
@@ -280,40 +290,23 @@ class TheThao
                                 ]);
                                 // if ((!boolval($request_servce->body()) && trim($content) != "") || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false)) {
                                 if ((!boolval($request_servce->body()) && trim($content) != "")) {
-                                    $news = new News;
-                                    $news->title = $title;
-                                    $news->title_img = $title_img;
-                                    $news->summary = $summary;
-                                    $news->content = $content;
-                                    $news->date_publish = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
-                                    $news->status = Config::get('app.STATUS_NEWS');
-                                    $news->view_count = random_int(100, 500);
-                                    $news->hot_or_nor = random_int(0,1);
-                                    $news->save();
-                                    $news->tags()->attach($GLOBALS['tag']);
-                                    $news->images()->saveMany($GLOBALS['images']);
-                                    $news->categories()->attach($GLOBALS['categories']);
+                                    $status = Config::get('app.STATUS_NEWS');
+                                    $view_count = random_int(100, 500);
+                                    $hot_or_nor = random_int(0, 1);
+                                    
+                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
                                 }
                                 echo $request_servce->body();
                             } else {
                                 // if (trim($content) != "" || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false)) {
                                 if (trim($content) != "") {
-                                    $news = new News;
-                                    $news->title = $title;
-                                    $news->title_img = $title_img;
-                                    $news->summary = $summary;
-                                    $news->content = $content;
-                                    $news->date_publish = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
-                                    $news->status = Config::get('app.STATUS_NEWS');
-                                    $news->view_count = random_int(100, 500);
-                                    $news->hot_or_nor = random_int(0,1);
-                                    $news->save();
-                                    $news->tags()->attach($GLOBALS['tag']);
-                                    $news->images()->saveMany($GLOBALS['images']);
-                                    $news->categories()->attach($GLOBALS['categories']);
+                                    $status = Config::get('app.STATUS_NEWS');
+                                    $view_count = random_int(100, 500);
+                                    $hot_or_nor = random_int(0, 1);
+                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
                                 }
                             }
-                            $GLOBALS['tag'] = [];
+                            $GLOBALS['tags'] = [];
                             $GLOBALS['images'] = [];
                             $GLOBALS['had_news_image'] = false;
                         }
@@ -343,14 +336,33 @@ class TheThao
                     $summary = $detail_crawler->filter('div.colcontent p.typo_news_detail')->text();
 
                     // Tag
-                    $GLOBALS['tag'] = [];
+                    $GLOBALS['tags'] = [];
                     $detail_crawler->filter('div.tags_article a')->each(function (Crawler $node) {
                         $get_tag = Tag::where(['name' => $node->text()])->first();
                         if (!$get_tag) {
                             $get_tag = Tag::create(['name' => $node->text()]);
                         }
-                        array_push($GLOBALS['tag'], $get_tag->id);
+                        array_push($GLOBALS['tags'], $get_tag->id);
                     });
+
+
+                    //set index for content and image
+                    $news_image_detect = $detail_crawler->filter('#main-detail')->children()->each(function (Crawler $node) {
+                        if ($node->filter('p')->count() > 0) {
+                            return "0";
+                        } else if ($node->filter('img')->count() > 0 || $node->filter('figure')->count() > 0) {
+                            return "1";
+                        }
+                        return null;
+                    });
+                    $news_image_detect = array_filter($news_image_detect, function ($item) {
+                        return $item !== null;
+                    });
+
+                    $news_image_detect = implode(' ', array_values($news_image_detect));
+
+                    //set index for content and image
+
                     // image
                     //get img content
                     $GLOBALS['had_news_image'] = false;
@@ -362,7 +374,7 @@ class TheThao
                             if (Image::where(['src' => $src])->first() === null) {
                                 $image = Image::create([
                                     'src' => $node->filter('img')->attr('src'),
-                                    'description' =>  $node->filter('figcaption')->count() > 0 ? $node->filter('figcaption')->text() : "null",
+                                    'description' =>  $node->filter('figcaption')->count() > 0 ? $node->filter('figcaption')->text() : "Thể thao 247",
                                 ]);
 
                                 array_push($GLOBALS['images'], $image);
@@ -373,14 +385,17 @@ class TheThao
                             }
                         }
                     });
+
                     //set publish_date
                     $datetime = $detail_crawler->filter('p.ptimezone.fregular')->text();
-                    // $datetime = trim(str_replace(['(GMT+7)'], '', $datetime)); // convert (GMT)-> GMT
                     $datetime = substr($datetime, 0, 19);
+                    $datetime = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
+
+
                     //news
                     $content = $detail_crawler->filter('#main-detail p')->each(function (Crawler $node) {
-                        if ($node->children()->count() == 0) return '<p>' . $node->text() . '</p>';
-                        // if($node->children()->count() == 0) return $node->text();
+                        if ($node->children()->count() == 0 && strlen(trim($node->text())) > 2)
+                            return '<p>' . $node->text() . '</p>';
                     });
                     $content = implode(' ', $content);
                     $db_content_monthDay = Category::where(['name' => 'LoL'])->first()->news()->get()
@@ -393,40 +408,22 @@ class TheThao
                         ]);
                         if ((!boolval($request_servce->body()) && trim($content) != "")) {
                             // if ((!boolval($request_servce->body()) && trim($content) != "" ) || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false )) {
-                            $news = new News;
-                            $news->title = $title;
-                            $news->title_img = $title_img;
-                            $news->summary = $summary;
-                            $news->content = $content;
-                            $news->date_publish = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
-                            $news->status = Config::get('app.STATUS_NEWS');
-                            $news->view_count = random_int(100, 500);
-                            $news->hot_or_nor = random_int(0,1);
-                            $news->save();
-                            $news->tags()->attach($GLOBALS['tag']);
-                            $news->images()->saveMany($GLOBALS['images']);
-                            $news->categories()->attach($GLOBALS['categories']);
+                            $status = Config::get('app.STATUS_NEWS');
+                            $view_count = random_int(100, 500);
+                            $hot_or_nor = random_int(0, 1);
+                            News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
                         }
                         echo $request_servce->body();
                     } else {
                         if (trim($content) != "") {
                             // if (trim($content) != "" || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false )) {
-                            $news = new News;
-                            $news->title = $title;
-                            $news->title_img = $title_img;
-                            $news->summary = $summary;
-                            $news->content = $content;
-                            $news->date_publish = now()->createFromFormat('d/m/Y H:i:s', $datetime, 'GMT+7');
-                            $news->status = Config::get('app.STATUS_NEWS');
-                            $news->view_count = random_int(100, 500);
-                            $news->hot_or_nor = random_int(0,1);
-                            $news->save();
-                            $news->tags()->attach($GLOBALS['tag']);
-                            $news->images()->saveMany($GLOBALS['images']);
-                            $news->categories()->attach($GLOBALS['categories']);
+                            $status = Config::get('app.STATUS_NEWS');
+                            $view_count = random_int(100, 500);
+                            $hot_or_nor = random_int(0, 1);
+                            News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
                         }
                     }
-                    $GLOBALS['tag'] = [];
+                    $GLOBALS['tags'] = [];
                     $GLOBALS['images'] = [];
                     $GLOBALS['had_news_image'] = false;
                 }

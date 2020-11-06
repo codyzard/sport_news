@@ -9,6 +9,7 @@ use App\Models\News;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 
 class NewsController extends Controller
@@ -63,7 +64,7 @@ class NewsController extends Controller
      */
     public function show($id)
     {
-        $news = News::find($id);
+        $news = News::find($id)->load('author')->load('tags')->load('categories')->load('images');
         if($news === null){
             return response()->json([
                 'message' => 'data null'
@@ -71,7 +72,10 @@ class NewsController extends Controller
         };
         $news->view_count += 1;
         $news->save();
-        return $news;
+        return response()->json([
+            'message' => 'success',
+            'news_detail' => $news,
+        ], 200);
     }
 
     /**
@@ -250,5 +254,22 @@ class NewsController extends Controller
             'message' => 'success',
             'feature_news' => $feature_news,
         ], 200);
+    }
+
+    public function news_base_keyword(Request $request)
+    {
+        $keyword = $request->keyword;
+        $news_base_search = News::where('title', 'like', '%'.$keyword.'%')
+        ->orWhere('summary','like','%'.$keyword.'%')
+        ->orderBy('date_publish', 'DESC')
+        ->paginate(Config::get('app._PAGINATION_OFFSET'));
+        if($news_base_search){
+            return response()->json([
+                'news_base_search' => $news_base_search,
+            ], 200);
+        }
+        return response()->json([
+            'message' => 'data null',
+        ],200);
     }
 }
