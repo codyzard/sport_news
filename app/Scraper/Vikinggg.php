@@ -59,7 +59,13 @@ class Vikinggg
                             $datetime = trim(($detail_crawler->filter('.new-published-date'))->text());
                             if (strpos($datetime, 'ngày trước')) {
                                 $datetime = now()->subDays(intval($datetime));
-                            } else {
+                            } 
+                            else if(strpos($datetime, 'giờ trước') || strpos($datetime, 'phút trước') 
+                                || (strpos($datetime, 'phút trước') && strpos($datetime, 'giờ trước'))
+                            ){
+                                $datetime = now();
+                            }
+                            else {
                                 $datetime = now()->createFromFormat('d.m.Y - H:i', $datetime, 'GMT+7');
                             }
 
@@ -73,7 +79,6 @@ class Vikinggg
                                 }
                                 array_push($GLOBALS['tag'], $get_tag->id);
                             });
-
                             $GLOBALS['tags'] = [];
                             $detail_crawler->filter('.new-tags li a')->each(function (Crawler $node) {
                                 $get_tag = Tag::where(['name' => $node->text()])->first();
@@ -139,7 +144,7 @@ class Vikinggg
                                     $status = Config::get('app.STATUS_NEWS');
                                     $view_count = random_int(100, 500);
                                     $hot_or_nor = random_int(0, 1);
-                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
+                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags'], 'vikings.gg');
                                 }
                                 echo $request_servce->body();
                             } else {
@@ -147,7 +152,7 @@ class Vikinggg
                                     $status = Config::get('app.STATUS_NEWS');
                                     $view_count = random_int(100, 500);
                                     $hot_or_nor = random_int(0, 1);
-                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
+                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags'], 'vikings.gg');
                                 }
                             }
                             $GLOBALS['tags'] = [];

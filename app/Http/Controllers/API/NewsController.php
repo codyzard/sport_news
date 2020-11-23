@@ -134,7 +134,7 @@ class NewsController extends Controller
 
     public function list_news_cate(Request $request)
     {
-        $cate_news = Category::where(['name' => $request->category])->first()->news();
+        $cate_news = Category::where(['name' => $request->category])->first()->news()->where('status', 1);
         if($cate_news->count() === 0)
         {
             return [];
@@ -214,7 +214,7 @@ class NewsController extends Controller
 
     public function latest_news_from_all_categories()
     {
-        $latest_news = News::orderBy('date_publish', 'DESC')->orderBy('view_count', 'DESC')->limit(6)->get();
+        $latest_news = News::where('status', 1)->orderBy('date_publish', 'DESC')->orderBy('view_count', 'DESC')->limit(6)->get();
         if ($latest_news->count() === 0){
             return response()->json([
                 'message' => 'data null'
@@ -227,7 +227,7 @@ class NewsController extends Controller
     }
     public function hot_news_in_week()
     {
-        $hot_news = News::where('hot_or_nor', true)->whereBetween('date_publish', [now()->subWeeks(2), now()])
+        $hot_news = News::where('hot_or_nor', true)->where('status', 1)->whereBetween('date_publish', [now()->subWeeks(2), now()])
         ->orderBy('date_publish', 'DESC')->orderBy('view_count', 'DESC')->limit(5)->get();
         if ($hot_news->count() === 0){
             return response()->json([
@@ -241,13 +241,14 @@ class NewsController extends Controller
     }
     public function feature_news(){
         $feature_news = array();
-        $bongda_anh = Category::where('name', 'Anh')->first()->news()->whereBetween('date_publish', [now()->subDay(), now()])
+        $bongda_anh = Category::where('name', 'Anh')->first()->news()->where('status', 1)->whereBetween('date_publish', [now()->subWeek(), now()])
                     ->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
-        $bongda = Category::where('name', 'Bóng đá')->first()->news()->whereBetween('date_publish', [now()->subDay(), now()])
+                
+        $bongda = Category::where('name', 'Bóng đá')->first()->news()->where('status', 1)->whereBetween('date_publish', [now()->subWeek(), now()])
                     ->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
-        $thethao = Category::where('name', 'Thể thao')->first()->news()->whereBetween('date_publish', [now()->subMonths(3), now()])
+        $thethao = Category::where('name', 'Thể thao')->first()->news()->where('status', 1)->whereBetween('date_publish', [now()->subMonths(12), now()])
         ->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
-        $esports = Category::where('name', 'E-sports')->first()->news()->whereBetween('date_publish', [now()->subWeek(), now()])
+        $esports = Category::where('name', 'E-sports')->first()->news()->where('status', 1)->whereBetween('date_publish', [now()->subWeek(2), now()])
         ->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
         array_push($feature_news, $bongda_anh, $bongda, $thethao, $esports);
         return response()->json([
@@ -260,6 +261,7 @@ class NewsController extends Controller
     {
         $keyword = $request->keyword;
         $news_base_search = News::where('title', 'like', '%'.$keyword.'%')
+        ->where('status', 1)
         ->orWhere('summary','like','%'.$keyword.'%')
         ->orderBy('date_publish', 'DESC')
         ->paginate(Config::get('app._PAGINATION_OFFSET'));

@@ -15,7 +15,6 @@ class CreateUserInfosTable extends Migration
     {
         Schema::create('user_infos', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
             $table->boolean('gender')->nullable();
             $table->date('birthday')->nullable();
             $table->string('address')->nullable();

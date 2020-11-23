@@ -21,7 +21,7 @@ class CreateNewsTable extends Migration
             $table->text('content')->nullable();
             $table->unsignedBigInteger('view_count')->default(0);
             $table->boolean('hot_or_nor')->nullable()->default(0); // 1 hot, 0 nor
-            $table->integer('status')->default(1);
+            $table->integer('status')->default(0);
             $table->date('date_publish');
             $table->unsignedBigInteger('author_id')->nullable();
             $table->string('slug');

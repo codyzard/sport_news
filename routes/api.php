@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\API\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\NewsController;
 use App\Http\Controllers\API\TagController;
@@ -17,10 +19,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
+// ---------------------- CLIENT ----------------------
 // News
 Route::post('news/list_news_cate', [NewsController::class, 'list_news_cate']);
 Route::post('news/list_news_tag', [NewsController::class, 'list_news_tag']);
@@ -44,3 +47,27 @@ Route::get('tags/news_base_tag/{tag}', [TagController::class, 'news_base_tag']);
 //Resouces
 Route::apiResource('/categories', CategoryController::class);
 Route::apiResource('/news', NewsController::class);
+
+// ---------------------- CLIENT ----------------------
+
+
+// ---------------------- ADMIN ----------------------
+
+//Session
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'auth'
+
+], function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    // Route::post('refresh', 'AuthController@refresh');
+    Route::get('user-profile', [AuthController::class, 'userProfile']);
+});
+
+Route::group(['prefix' => 'admin'], function () {
+    Route::apiResource('/categories', AdminCategoryController::class);
+});
+
+// ---------------------- ADMIN ----------------------

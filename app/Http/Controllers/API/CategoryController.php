@@ -133,7 +133,7 @@ class CategoryController extends Controller
         foreach($parent_cate as $p){
             foreach($p->sub_cate as $sub){
                 $sub->cate_news= Category::where('name', $sub->name)
-                ->first()->news()->orderBy('date_publish', 'DESC')->limit(4)->get(
+                ->first()->news()->where('status', 1)->orderBy('date_publish', 'DESC')->limit(4)->get(
                 )->toArray();
             }
         }
@@ -153,7 +153,7 @@ class CategoryController extends Controller
                 'message' => 'data null',
             ],200);
         }
-        $respone_cate[$parent_cate->name] = $request_cate->news()->orderBy('date_publish', 'DESC')->limit(4)->get();
+        $respone_cate[$parent_cate->name] = $request_cate->news()->where('status', 1)->orderBy('date_publish', 'DESC')->limit(4)->get();
         return response()->json([
             'message' => 'success',
             'change_cate_news' => $respone_cate,
@@ -183,24 +183,19 @@ class CategoryController extends Controller
     }
 
     public function news_basein_cate($id)
-    {   
+    {
         $get_cate = Category::find($id);
         if($get_cate) {
             $full_news = $get_cate->news()->orderBy('date_publish', 'DESC')->with('categories');
             $latest_news_basein_cate =  $get_cate->news()->orderBy('date_publish', 'DESC')
             ->with('categories')->get()->take(Config::get('app._TAKE_OFFSET'));
             $excluding_news_id = $latest_news_basein_cate->pluck('id');
-            $news_basein_cate =  $get_cate->news()->whereNotIn('news_id', $excluding_news_id)->orderBy('date_publish', 'DESC')
+            $news_basein_cate =  $get_cate->news()->where('status', 1)->whereNotIn('news_id', $excluding_news_id)->orderBy('date_publish', 'DESC')
             ->with('categories')->paginate(Config::get('app._PAGINATION_OFFSET'));
         }
         return response()->json([
             'news_basein_cate' => $news_basein_cate,
             'latest_news_basein_cate' =>$latest_news_basein_cate,
         ], 200);
-    }
-
-    public function get_one_category()
-    {
-        # code...
     }
 }

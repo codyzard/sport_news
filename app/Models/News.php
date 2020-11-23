@@ -66,7 +66,8 @@ class News extends Model
         $news_image_detect,
         $images_arr,
         $categories_arr,
-        $tags_arr
+        $tags_arr,
+        $news_src
     ) {
         $news = new News;
         $news->title = $title;
@@ -78,6 +79,7 @@ class News extends Model
         $news->view_count = $view_count;
         $news->hot_or_nor = $hot_or_nor;
         $news->content_image_dectect = $news_image_detect;
+        $news->news_src = $news_src;
         $news->save();
         $news->images()->saveMany($images_arr);
         $news->categories()->attach($categories_arr);

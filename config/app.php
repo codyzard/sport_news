@@ -175,7 +175,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Cviebrock\EloquentSluggable\ServiceProvider::class,
-
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
     ],
 
     /*
@@ -227,9 +227,12 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
 
     ],
-    '_SERVICE_URL' => 'http://127.0.0.1:5000',
+    '_SERVICE_URL' => 'https://similatirydocs.herokuapp.com/',
+    // '_SERVICE_URL' => 'http://127.0.0.1:5000/',
     'STATUS_NEWS' => 1,
     '_PAGINATION_OFFSET' => 9,
     '_TAKE_OFFSET' => 4,

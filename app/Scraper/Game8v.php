@@ -123,7 +123,7 @@ class Game8v
                                     $status = Config::get('app.STATUS_NEWS');
                                     $view_count = random_int(100, 500);
                                     $hot_or_nor = random_int(0, 1);
-                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
+                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags'], "Game8v.vn");
                                 }
                                 echo $request_servce->body();
                             } else {
@@ -131,7 +131,7 @@ class Game8v
                                     $status = Config::get('app.STATUS_NEWS');
                                     $view_count = random_int(100, 500);
                                     $hot_or_nor = random_int(0, 1);
-                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags']);
+                                    News::saveNews($title, $title_img, $summary, $content, $datetime, $status, $view_count, $hot_or_nor, $news_image_detect, $GLOBALS['images'], $GLOBALS['categories'], $GLOBALS['tags'], "Game8v.vn");
                                 }
                             }
                             $GLOBALS['tags'] = [];

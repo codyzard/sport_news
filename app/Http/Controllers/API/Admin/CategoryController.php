@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tag;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
-class TagController extends Controller
+class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,7 +16,11 @@ class TagController extends Controller
      */
     public function index()
     {
-        //
+        $categories = Category::paginate(Config::get('app._PAGINATION_OFFSET'));
+        return response()->json([
+            'message' => 'success',
+            'categories' => $categories,
+        ], 200);
     }
 
     /**
@@ -62,30 +66,5 @@ class TagController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function random_tags()
-    {
-        $random_tags = Tag::all()->random(10);
-        if($random_tags === null){
-            return response()->json([
-                'message' => 'data null',
-            ],200);
-        }
-        return response()->json([
-            'message' => 'success',
-            'random_tags' => $random_tags,
-        ],200);
-    }
-
-    public function news_base_tag($id)
-    {   
-        $get_tag = Tag::find($id);
-        if($get_tag) {
-            $news_base_tag = $get_tag->news()->where('status', 1)->orderBy('date_publish', 'DESC')->with('categories')->paginate(Config::get('app._PAGINATION_OFFSET'));
-        }
-        return response()->json([
-            'news_base_tag' => $news_base_tag,
-        ], 200);
     }
 }
