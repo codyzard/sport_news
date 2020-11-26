@@ -2,34 +2,27 @@
 
 namespace App\Models;
 
-use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class UserInfo extends Model
 {
-    use HasFactory, Sluggable;
+    use HasFactory;
 
     protected $fillable = [
-        'name',
         'gender',
         'birthday',
         'address',
         'phone',
         'avartar_src'
     ];
-
-    public function sluggable()
-    {
-        return [
-            'slug' => [
-                'source' => 'name'
-            ]
-        ];
-    }
-
-    public function account(){
-        return $this->hasOne('App\Models\User');
+    // User::find(1)->user_info()->create([
+    //     'gender' => 1,
+    //     'address' => 'LCL',
+    //     'phone' => '0774455559'
+    // ])
+    public function user(){
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 
     public function news(){

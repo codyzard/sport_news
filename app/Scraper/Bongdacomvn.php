@@ -26,6 +26,7 @@ class Bongdacomvn
     {
         $cate_soccer = 'Bóng đá';
         $this->soccer($cate_soccer, 'Anh', 'http://www.bongda.com.vn/ngoai-hang-anh/', 1);
+        $this->soccer($cate_soccer, 'Anh', 'http://www.bongda.com.vn/bong-da-anh/', 1);
         $this->soccer($cate_soccer, 'Việt Nam', 'http://www.bongda.com.vn/viet-nam/', 1);
         $this->soccer($cate_soccer, 'Tây Ban Nha', 'http://www.bongda.com.vn/bong-da-tbn/', 1);
         $this->soccer($cate_soccer, 'Đức', 'http://www.bongda.com.vn/bong-da-duc/', 1);
@@ -35,7 +36,7 @@ class Bongdacomvn
         $this->soccer($cate_soccer, 'C2', 'http://www.bongda.com.vn/europa-league/', 4);
         $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/euro-2020/', 12);
         $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/bong-da-chau-au/', 4);
-        $this->soccer($cate_soccer, 'Chuyển nhượng', 'http://www.bongda.com.vn/tin-chuyen-nhuong/', 1);
+        $this->soccer($cate_soccer, 'Chuyển nhượng', 'http://www.bongda.com.vn/tin-chuyen-nhuong/', 3);
     }
     public function soccer($parent_category, $category, $url, $timeCheck)
     {

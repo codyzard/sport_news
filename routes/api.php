@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\API\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\API\Admin\UserController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\NewsController;
 use App\Http\Controllers\API\TagController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -67,7 +67,12 @@ Route::group([
 });
 
 Route::group(['prefix' => 'admin'], function () {
-    Route::apiResource('/categories', AdminCategoryController::class);
+    Route::apiResource('categories', AdminCategoryController::class);
+    Route::get('get_parent_category', [AdminCategoryController::class, 'get_parent_category']);
+    Route::post('update_category', [AdminCategoryController::class, 'update_category']);
+    Route::post('destroy_category', [AdminCategoryController::class, 'destroy_category']);
+    Route::post('update_avatar', [UserController::class, 'update_avatar']);
+
 });
 
 // ---------------------- ADMIN ----------------------

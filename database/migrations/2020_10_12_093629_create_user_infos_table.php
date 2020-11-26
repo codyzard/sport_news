@@ -20,7 +20,6 @@ class CreateUserInfosTable extends Migration
             $table->string('address')->nullable();
             $table->string('phone')->nullable();
             $table->string('avatar_src')->nullable();
-            $table->string('slug');
             $table->timestamps();
         });
     }

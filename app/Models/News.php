@@ -31,7 +31,7 @@ class News extends Model
 
     public function author()
     {
-        return $this->belongsTo('App\Models\UserInfo');
+        return $this->belongsTo('App\Models\User');
     }
 
     public function images()

@@ -28,4 +28,12 @@ class Category extends Model
     public function news(){
         return $this->belongsToMany('App\Models\News', 'category_news', 'category_id', 'news_id');
     }
+
+    public static function store_category($validated)
+    {
+        $category = new Category($validated);
+        $category->save();
+
+        return $category;
+    }
 }

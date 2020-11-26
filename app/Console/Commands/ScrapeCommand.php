@@ -51,9 +51,9 @@ class ScrapeCommand extends Command
         $game8v = new Game8v;
 
         // invoke crawl
-        // $bongda->scrape();
-        // $thethao->scrape();
-        // $fo4->scrape();
+        $bongda->scrape();
+        $thethao->scrape();
+        $fo4->scrape();
         $vikinggg->scrape();
         $game8v->scrape();
 

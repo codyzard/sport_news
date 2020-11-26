@@ -23,14 +23,14 @@ class CreateNewsTable extends Migration
             $table->boolean('hot_or_nor')->nullable()->default(0); // 1 hot, 0 nor
             $table->integer('status')->default(0);
             $table->date('date_publish');
-            $table->unsignedBigInteger('author_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('slug');
             $table->string('content_image_dectect')->nullable();
             $table->timestamps();
 
-            $table->foreign('author_id')
+            $table->foreign('user_id')
                 ->references('id')
-                ->on('user_infos');
+                ->on('users');
         });
     }
 

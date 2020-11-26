@@ -231,8 +231,8 @@ return [
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
 
     ],
-    '_SERVICE_URL' => 'https://similatirydocs.herokuapp.com/',
-    // '_SERVICE_URL' => 'http://127.0.0.1:5000/',
+    // '_SERVICE_URL' => 'https://similatirydocs.herokuapp.com/',
+    '_SERVICE_URL' => 'http://127.0.0.1:5000/',
     'STATUS_NEWS' => 1,
     '_PAGINATION_OFFSET' => 9,
     '_TAKE_OFFSET' => 4,
