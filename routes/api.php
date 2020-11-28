@@ -56,23 +56,24 @@ Route::apiResource('/news', NewsController::class);
 //Session
 Route::group([
     'middleware' => 'api',
-    'prefix' => 'auth'
+    'prefix' => 'auth',
 
 ], function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     Route::post('logout', [AuthController::class, 'logout']);
-    // Route::post('refresh', 'AuthController@refresh');
+    Route::post('refresh', [AuthController::class, 'refresh']);
     Route::get('user-profile', [AuthController::class, 'userProfile']);
+    Route::post('update_avatar', [AuthController::class, 'update_avatar']);
 });
 
-Route::group(['prefix' => 'admin'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
     Route::apiResource('categories', AdminCategoryController::class);
     Route::get('get_parent_category', [AdminCategoryController::class, 'get_parent_category']);
     Route::post('update_category', [AdminCategoryController::class, 'update_category']);
     Route::post('destroy_category', [AdminCategoryController::class, 'destroy_category']);
     Route::post('update_avatar', [UserController::class, 'update_avatar']);
-
+    Route::post('update_info', [UserController::class, 'update_info']);
 });
 
 // ---------------------- ADMIN ----------------------

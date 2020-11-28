@@ -136,12 +136,12 @@ class TheThao
                                 $content = implode(' ', $content);
                                 // $db_content_thisDay = News::whereDate('created_at', '=', now()->today())->get('content');
                                 $db_content_monthDay = Category::where(['name' => 'Bóng đá'])->first()->news()->get()
-                                    ->whereBetween('date_publish', [now()->subYear(), now()])->pluck('content');
+                                    ->whereBetween('date_publish', [now()->subYear(), now()])->pluck('summary');
 
                                 if ($db_content_monthDay->count() != 0) {
                                     $request_servce = Http::post($this->service_url . '/check_similarity', [
                                         'from_db' => $db_content_monthDay,
-                                        'data_check' => $content,
+                                        'data_check' => $summary,
                                     ]);
                                     // if ((!boolval($request_servce->body()) && trim($content) != "") || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false)) {
                                     if ((!boolval($request_servce->body()) && trim($content) != "")) {
@@ -281,12 +281,12 @@ class TheThao
                             });
                             $content = implode(' ', $content);
                             $db_content_monthDay = Category::where(['name' => 'Thể thao'])->first()->news()->get()
-                                ->whereBetween('date_publish', [now()->subYears(10), now()])->pluck('content');
+                                ->whereBetween('date_publish', [now()->subYears(10), now()])->pluck('summary');
 
                             if ($db_content_monthDay->count() != 0) {
                                 $request_servce = Http::post($this->service_url . '/check_similarity', [
                                     'from_db' => $db_content_monthDay,
-                                    'data_check' => $content,
+                                    'data_check' => $summary,
                                 ]);
                                 // if ((!boolval($request_servce->body()) && trim($content) != "") || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false)) {
                                 if ((!boolval($request_servce->body()) && trim($content) != "")) {
@@ -399,12 +399,12 @@ class TheThao
                     });
                     $content = implode(' ', $content);
                     $db_content_monthDay = Category::where(['name' => 'LoL'])->first()->news()->get()
-                        ->whereBetween('date_publish', [now()->subYears(2), now()])->pluck('content');
+                        ->whereBetween('date_publish', [now()->subYears(2), now()])->pluck('summary');
 
                     if ($db_content_monthDay->count() != 0) {
                         $request_servce = Http::post($this->service_url . '/check_similarity', [
                             'from_db' => $db_content_monthDay,
-                            'data_check' => $content,
+                            'data_check' => $summary,
                         ]);
                         if ((!boolval($request_servce->body()) && trim($content) != "")) {
                             // if ((!boolval($request_servce->body()) && trim($content) != "" ) || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false )) {

@@ -4,18 +4,22 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserInfo;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function __construct() {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'update_avatar']]);
     }
 
-    public function login(Request $request){
-    	$validator = Validator::make($request->all(), [
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
@@ -24,7 +28,7 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        if (! $token = Auth::attempt($validator->validated())) {
+        if (!$token = Auth::attempt($validator->validated())) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -36,21 +40,22 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|confirmed|min:6',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
 
         $user = User::create(array_merge(
-                    $validator->validated(),
-                    ['password' => bcrypt($request->password)]
-                ));
+            $validator->validated(),
+            ['password' => bcrypt($request->password)]
+        ));
 
         return response()->json([
             'message' => 'User successfully registered',
@@ -64,7 +69,8 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function logout() {
+    public function logout()
+    {
         auth()->logout();
 
         return response()->json(['message' => 'User successfully signed out']);
@@ -75,7 +81,8 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function refresh() {
+    public function refresh()
+    {
         return $this->createNewToken(auth()->refresh());
     }
 
@@ -84,10 +91,34 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function userProfile() {
+    public function userProfile()
+    {
         return response()->json(auth()->user());
     }
 
+    public function update_avatar(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            $file = $request->file('file')->getRealPath();
+            $user = auth()->user();
+            $user_info = null;
+            if ($user->user_info === null) {
+                $user_info = $user->user_info()->create();
+            } else {
+                $user_info = $user->user_info()->first();
+            }
+            $uploadedFileUrl = Cloudinary::upload($file)->getSecurePath();
+            $user_info->avatar_src = $uploadedFileUrl;
+            $user_info->save();
+            return response()->json([
+                'message' => 'update avatar success',
+                'user' => $user->load('user_info'),
+            ], 200);
+        }
+        return response()->json([
+            'message' => 'upload file failed',
+        ], 200);
+    }
     /**
      * Get the token array structure.
      *
@@ -95,13 +126,13 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function createNewToken($token){
+    protected function createNewToken($token)
+    {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
-            'user' => auth()->user(),
-            'user_info' => auth()->user()->user_info
+            'user' => auth()->user()->load('user_info'),
         ]);
     }
 }

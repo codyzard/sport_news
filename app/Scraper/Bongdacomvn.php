@@ -32,10 +32,10 @@ class Bongdacomvn
         $this->soccer($cate_soccer, 'Đức', 'http://www.bongda.com.vn/bong-da-duc/', 1);
         $this->soccer($cate_soccer, 'Ý', 'http://www.bongda.com.vn/bong-da-y/', 1);
         $this->soccer($cate_soccer, 'Pháp', 'http://www.bongda.com.vn/bong-da-phap/', 1);
-        $this->soccer($cate_soccer, 'C1', 'http://www.bongda.com.vn/champions-league/', 4);
-        $this->soccer($cate_soccer, 'C2', 'http://www.bongda.com.vn/europa-league/', 4);
-        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/euro-2020/', 12);
-        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/bong-da-chau-au/', 4);
+        $this->soccer($cate_soccer, 'C1', 'http://www.bongda.com.vn/champions-league/', 1);
+        $this->soccer($cate_soccer, 'C2', 'http://www.bongda.com.vn/europa-league/', 1);
+        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/euro-2020/', 1);
+        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/bong-da-chau-au/', 1);
         $this->soccer($cate_soccer, 'Chuyển nhượng', 'http://www.bongda.com.vn/tin-chuyen-nhuong/', 3);
     }
     public function soccer($parent_category, $category, $url, $timeCheck)
@@ -104,7 +104,7 @@ class Bongdacomvn
                                 if (Image::where(['src' => $src])->first() === null) {
                                     $image = Image::create([
                                         'src' => $node->filter('img')->attr('src'),
-                                        'description' =>  $node->filter('figcaption')->text(),
+                                        'description' =>  $node->filter('figcaption')->count() > 0 ? $node->filter('figcaption')->text() : "Bongda.com.vn",
                                     ]);
 
                                     array_push($GLOBALS['images'], $image);
@@ -119,13 +119,14 @@ class Bongdacomvn
                             return '<p>' . $node->text() . '</p>';
                         });
                         $content = implode(' ', $content);
-                        $db_content_monthDay = Category::where(['name' => $category])->first()->news()->get()
-                            ->whereBetween('date_publish', [now()->subMonths($timeCheck), now()->addDay()])->pluck('content');
+                        // $db_content_monthDay = Category::where(['name' => $category])->first()->news()->get()
+                        $db_content_monthDay = Category::where(['name' => 'Bóng đá'])->first()->news()->get()
+                            ->whereBetween('date_publish', [now()->subMonths($timeCheck), now()->addDay()])->pluck('summary');
 
                         if ($db_content_monthDay->count() > 0) {
                             $request_servce = Http::post($this->service_url . '/check_similarity', [
                                 'from_db' => $db_content_monthDay,
-                                'data_check' => $content,
+                                'data_check' => $summary,
                             ]);
                             if ((!boolval($request_servce->body()) && trim($content) != "") || (empty($GLOBALS['images']) && $GLOBALS['had_news_image'] === false)) {
                                 $status = Config::get('app.STATUS_NEWS');

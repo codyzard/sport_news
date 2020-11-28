@@ -3,21 +3,21 @@
 namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    
     public function update_avatar(Request $request)
     {
-        $upload_path = storage_path('app/public/images');
-        $file_name = $request->file->getClientOriginalName();
-        $generated_new_name = time() . '.' . $request->file->getClientOriginalExtension();
-        $file = $request->file->move($upload_path, $generated_new_name);
-        $url = Storage::url('app/public/images/'.$generated_new_name);
-        return $file;
-        return response()->json(['success' => 'You have successfully uploaded "' . $file_name . '"']);
-        // return $request->file->getClientOriginalName();
+        $file = $request->file('file')->getRealPath();
+        $uploadedFileUrl = Cloudinary::upload($file)->getSecurePath();
+        return $uploadedFileUrl;
+    }
+    public function update_info(Request $request)
+    {
+        return $request->all();
     }
     /**
      * Display a listing of the resource.
