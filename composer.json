@@ -18,6 +18,7 @@
         "jrm2k6/cloudder": "^0.6.0",
         "kreait/laravel-firebase": "^3.0",
         "laravel/framework": "^8.0",
+        "laravel/telescope": "^4.3",
         "laravel/tinker": "^2.0",
         "tymon/jwt-auth": "^1.0"
     },

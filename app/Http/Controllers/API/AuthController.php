@@ -4,8 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\UserInfo;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +14,7 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'update_avatar']]);
+        // $this->middleware('jwt.auth', ['except' => ['login', 'register']]);
     }
 
     public function login(Request $request)
@@ -119,6 +119,38 @@ class AuthController extends Controller
             'message' => 'upload file failed',
         ], 200);
     }
+
+    public function update_info(Request $request)
+    {
+        try{
+            $user = auth()->user();
+            $user_info = null;
+            if ($user->user_info === null) {
+                $user_info = $user->user_info()->create();
+            } else {
+                $user_info = $user->user_info()->first();
+            }
+            if($request->name !== null){
+                $user->name = $request->name;
+            }
+            $user_info->gender = $request->gender ;
+            $user_info->birthday = $request->birthday ? now()->createFromFormat('Y-m-d', $request->birthday) : null;
+            $user_info->address = $request->address;
+            $user_info->phone = $request->phone;
+            $user_info->save();
+            $user->save();
+            return response()->json([
+                'message' => 'update info success',
+                'user' => $user->load('user_info'),
+            ], 200);
+        }
+        catch(Exception $e){
+            return response()->json([
+                'message' => 'update info failed',
+            ], 200);
+        }
+    }
+
     /**
      * Get the token array structure.
      *
