@@ -9,6 +9,8 @@
     "license": "MIT",
     "require": {
         "php": "^7.3",
+        "buihuycuong/vnfaker": "dev-master",
+        "ckfinder/ckfinder-laravel-package": "v3.5.1.6",
         "cloudinary-labs/cloudinary-laravel": "^1.0",
         "cviebrock/eloquent-sluggable": "^8.0",
         "fabpot/goutte": "^4.0",

@@ -25,17 +25,17 @@ class Bongdacomvn
     public function scrape()
     {
         $cate_soccer = 'Bóng đá';
-        $this->soccer($cate_soccer, 'Anh', 'http://www.bongda.com.vn/ngoai-hang-anh/', 1);
-        $this->soccer($cate_soccer, 'Anh', 'http://www.bongda.com.vn/bong-da-anh/', 1);
-        $this->soccer($cate_soccer, 'Việt Nam', 'http://www.bongda.com.vn/viet-nam/', 1);
-        $this->soccer($cate_soccer, 'Tây Ban Nha', 'http://www.bongda.com.vn/bong-da-tbn/', 1);
-        $this->soccer($cate_soccer, 'Đức', 'http://www.bongda.com.vn/bong-da-duc/', 1);
-        $this->soccer($cate_soccer, 'Ý', 'http://www.bongda.com.vn/bong-da-y/', 1);
-        $this->soccer($cate_soccer, 'Pháp', 'http://www.bongda.com.vn/bong-da-phap/', 1);
-        $this->soccer($cate_soccer, 'C1', 'http://www.bongda.com.vn/champions-league/', 1);
-        $this->soccer($cate_soccer, 'C2', 'http://www.bongda.com.vn/europa-league/', 1);
-        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/euro-2020/', 1);
-        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/bong-da-chau-au/', 1);
+        $this->soccer($cate_soccer, 'Anh', 'http://www.bongda.com.vn/ngoai-hang-anh/', 2);
+        $this->soccer($cate_soccer, 'Anh', 'http://www.bongda.com.vn/bong-da-anh/', 2);
+        $this->soccer($cate_soccer, 'Việt Nam', 'http://www.bongda.com.vn/viet-nam/', 2);
+        $this->soccer($cate_soccer, 'Tây Ban Nha', 'http://www.bongda.com.vn/bong-da-tbn/', 2);
+        $this->soccer($cate_soccer, 'Đức', 'http://www.bongda.com.vn/bong-da-duc/', 2);
+        $this->soccer($cate_soccer, 'Ý', 'http://www.bongda.com.vn/bong-da-y/', 2);
+        $this->soccer($cate_soccer, 'Pháp', 'http://www.bongda.com.vn/bong-da-phap/', 2);
+        $this->soccer($cate_soccer, 'C1', 'http://www.bongda.com.vn/champions-league/', 3);
+        $this->soccer($cate_soccer, 'C2', 'http://www.bongda.com.vn/europa-league/', 3);
+        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/euro-2020/', 48);
+        $this->soccer($cate_soccer, 'Các giải khác', 'http://www.bongda.com.vn/bong-da-chau-au/', 3);
         $this->soccer($cate_soccer, 'Chuyển nhượng', 'http://www.bongda.com.vn/tin-chuyen-nhuong/', 3);
     }
     public function soccer($parent_category, $category, $url, $timeCheck)

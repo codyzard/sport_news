@@ -242,4 +242,5 @@ return [
     'STATUS_NEWS' => 1,
     '_PAGINATION_OFFSET' => 9,
     '_TAKE_OFFSET' => 4,
+    '_PAGINATION_ADMIN_OFFSET' => 5,
 ];

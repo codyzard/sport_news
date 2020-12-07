@@ -15,6 +15,17 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
+        // $this->manualCreate();
+        $this->automaticCreate(50);
+    }
+
+    public static function automaticCreate($number)
+    {
+       User::factory($number)->create();
+    }
+
+    public static function manualCreate()
+    {
         // Admin
         User::create([
             'name' => 'Quản trị viên',
@@ -31,7 +42,13 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => bcrypt('tuprovip123'), // password
             'remember_token' => Str::random(10),
-            'role' => 0,
+        ]);
+        User::create([
+            'name' => 'Lê Hy',
+            'email' => "lhtu7198@gmail.com",
+            'email_verified_at' => now(),
+            'password' => bcrypt('tuprovip123'), // password
+            'remember_token' => Str::random(10),
         ]);
     }
 }

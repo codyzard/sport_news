@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\API\Admin\AdminApprovalNewsController;
+use App\Http\Controllers\API\Admin\AuthorAccountController;
 use App\Http\Controllers\API\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\API\Admin\NewsAuthorController;
 use App\Http\Controllers\API\Admin\UserController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
@@ -55,7 +58,6 @@ Route::apiResource('/news', NewsController::class);
 
 //Session
 Route::group([
-    // 'middleware' => 'jwt.auth',
     'prefix' => 'auth',
 ], function () {
     Route::post('login', [AuthController::class, 'login']);
@@ -68,11 +70,35 @@ Route::group([
 
 });
 
+//News Author
+Route::group([
+    'prefix' => 'news_author',
+], function (){
+    Route::get('init_available_data', [NewsAuthorController::class, 'init_available_data']);
+    Route::get('parent_category_res_child_category/{parent_category}', [NewsAuthorController::class, 'parent_category_res_child_category']);
+    Route::get('get_all_news', [NewsAuthorController::class, 'get_all_news']);
+    Route::post('upload_news', [NewsAuthorController::class, 'upload_news']);
+    Route::post('update/{news}', [NewsAuthorController::class, 'update']);
+    Route::post('search_author_news', [NewsAuthorController::class, 'search_author_news']);
+
+});
+
+// Admin
 Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
+    // manage category
     Route::apiResource('categories', AdminCategoryController::class);
+    Route::post('search_categories', [AdminCategoryController::class, 'search_categories']);
     Route::get('get_parent_category', [AdminCategoryController::class, 'get_parent_category']);
     Route::post('update_category', [AdminCategoryController::class, 'update_category']);
     Route::post('destroy_category', [AdminCategoryController::class, 'destroy_category']);
+    // manage approval news
+    Route::get('get_all_approval_news', [AdminApprovalNewsController::class, 'get_all_approval_news']);
+    Route::post('approving_news', [AdminApprovalNewsController::class, 'approving_news']);
+    Route::post('search_approval_news', [AdminApprovalNewsController::class, 'search_approval_news']);
+    //manage author account
+    Route::get('get_all_author_account', [AuthorAccountController::class, 'get_all_author_account']);
+    Route::post('block_or_active', [AuthorAccountController::class, 'block_or_active']);
 });
 
 // ---------------------- ADMIN ----------------------
+

@@ -64,7 +64,7 @@ class NewsController extends Controller
      */
     public function show($id)
     {
-        $news = News::find($id)->load('author')->load('tags')->load('categories')->load('images');
+        $news = News::find($id)->load('user')->load('tags')->load('categories')->load('images');
         if($news === null){
             return response()->json([
                 'message' => 'data null'
@@ -242,14 +242,14 @@ class NewsController extends Controller
     public function feature_news(){
         $feature_news = array();
         $bongda_anh = Category::where('name', 'Anh')->first()->news()->where('status', 1)->whereBetween('date_publish', [now()->subWeek(), now()])
-                    ->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
+                    ->with('categories')->with('categories') ->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
                 
         $bongda = Category::where('name', 'Bóng đá')->first()->news()->where('status', 1)->whereBetween('date_publish', [now()->subWeek(), now()])
-                    ->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
+        ->with('categories')->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
         $thethao = Category::where('name', 'Thể thao')->first()->news()->where('status', 1)->whereBetween('date_publish', [now()->subMonths(12), now()])
-        ->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
+        ->with('categories')->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
         $esports = Category::where('name', 'E-sports')->first()->news()->where('status', 1)->whereBetween('date_publish', [now()->subWeek(2), now()])
-        ->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
+        ->with('categories')->orderBy('date_publish','DESC')->orderBy('view_count', 'DESC')->limit(1)->get();
         array_push($feature_news, $bongda_anh, $bongda, $thethao, $esports);
         return response()->json([
             'message' => 'success',

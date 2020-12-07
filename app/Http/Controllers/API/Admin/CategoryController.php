@@ -18,7 +18,7 @@ class CategoryController extends Controller
     public function index()
     {
         // $categories = Category::where('parent_id', '!=', null)->paginate(Config::get('app._PAGINATION_OFFSET'));
-        $categories = Category::paginate(Config::get('app._PAGINATION_OFFSET'));
+        $categories = Category::withCount('news')->paginate(Config::get('app._PAGINATION_OFFSET'));
         return response()->json([
             'message' => 'success',
             'categories' => $categories,
@@ -148,5 +148,15 @@ class CategoryController extends Controller
             'parent_id' => 'required|integer'
         ]);
         return $validator;
+    }
+
+    public function search_categories(Request $request)
+    {   
+        $keyword = $request->keyword;
+        $search_categories = Category::where('name', 'like', '%'.$keyword.'%')->withCount('news')
+        ->paginate(Config::get('app._PAGINATION_OFFSET'));
+        return response()->json([
+            'search_categories' => $search_categories,
+        ], 200);
     }
 }

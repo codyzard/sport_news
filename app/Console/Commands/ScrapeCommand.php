@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Helper\CrawlerHelper;
+use App\Models\News;
 use App\Scraper\Bongdacomvn;
 use App\Scraper\Fo4;
 use App\Scraper\Game8v;
@@ -56,7 +57,7 @@ class ScrapeCommand extends Command
         $fo4->scrape();
         $vikinggg->scrape();
         $game8v->scrape();
-
+        
         CrawlerHelper::clean_image_trash();
     }
 }
