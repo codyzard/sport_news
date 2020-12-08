@@ -260,10 +260,9 @@ class NewsController extends Controller
     public function news_base_keyword(Request $request)
     {
         $keyword = $request->keyword;
-        $news_base_search = News::where('title', 'like', '%'.$keyword.'%')
-        ->where('status', 1)
-        ->orWhere('summary','like','%'.$keyword.'%')
-        ->orWhere('content','like','%'.$keyword.'%')
+        $news_base_search = News::where([['title', 'like', '%'.$keyword.'%'], ['status', 1]])
+        ->orWhere([['summary','like','%'.$keyword.'%'], ['status', 1]])
+        ->orWhere([['content','like','%'.$keyword.'%'], ['status', 1]])
         ->orderBy('date_publish', 'DESC')
         ->paginate(Config::get('app._PAGINATION_OFFSET'));
         if($news_base_search){

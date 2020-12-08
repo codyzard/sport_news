@@ -4,6 +4,7 @@ use App\Http\Controllers\API\Admin\AdminApprovalNewsController;
 use App\Http\Controllers\API\Admin\AuthorAccountController;
 use App\Http\Controllers\API\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\API\Admin\NewsAuthorController;
+use App\Http\Controllers\API\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\API\Admin\UserController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
@@ -98,7 +99,15 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
     //manage author account
     Route::get('get_all_author_account', [AuthorAccountController::class, 'get_all_author_account']);
     Route::post('block_or_active', [AuthorAccountController::class, 'block_or_active']);
+    Route::post('search_author_account', [AuthorAccountController::class, 'search_author_account']);
+    Route::post('create_author_account', [AuthorAccountController::class, 'create_author_account']);
+    //manage news
+    Route::get('get_white_list_news', [AdminNewsController::class, 'get_white_list_news']);
+    Route::post('search_white_list_news', [AdminNewsController::class, 'search_white_list_news']);
+    Route::post('push_to_pending', [AdminNewsController::class, 'push_to_pending']);
+    
 });
+
 
 // ---------------------- ADMIN ----------------------
 
