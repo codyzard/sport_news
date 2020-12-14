@@ -110,7 +110,7 @@ class Fo4
                             });
                             $content = implode(' ', $content);
                             $db_content_monthDay = Category::where(['name' => 'Fifa online 4'])->first()->news()->get()
-                                ->whereBetween('date_publish', [now()->subMonths(1), now()->addDay()])->pluck('content');
+                                ->whereBetween('date_publish', [now()->subMonths(2), now()->addDay()])->pluck('content');
                             if ($db_content_monthDay->count() > 0) {
                                 $request_servce = Http::post($this->service_url . '/check_similarity', [
                                     'from_db' => $db_content_monthDay,

@@ -65,7 +65,7 @@ class NewsController extends Controller
     public function show($id)
     {
         $news = News::find($id)->load('user')->load('tags')->load('categories')->load('images');
-        if($news === null){
+        if($news === null || $news->status !== 1){
             return response()->json([
                 'message' => 'data null'
             ], 200);
