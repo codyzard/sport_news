@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        // $this->manualCreate();
+        $this->manualCreate();
         $this->automaticCreate(50);
     }
 
