@@ -19,12 +19,12 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-
+        
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
@@ -32,8 +32,8 @@ class AuthController extends Controller
         if (!$token = Auth::attempt($validator->validated())) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        if (auth()->user()->activation !== 1) {
+        
+        if (auth()->user()->activation !== 1){
             return response()->json(['error' => 'Account is block'], 401);
         }
         return $this->createNewToken($token);
@@ -111,18 +111,13 @@ class AuthController extends Controller
             } else {
                 $user_info = $user->user_info()->first();
             }
-            try {
-                $uploadedFileUrl = Cloudinary::upload($file)->getSecurePath();
-            } catch (Exception $e) {
-                return $e->getMessage();
-            } finally {
-                $user_info->avatar_src = $uploadedFileUrl;
-                $user_info->save();
-                return response()->json([
-                    'message' => 'update avatar success',
-                    'user' => $user->load('user_info'),
-                ], 200);
-            }
+            $uploadedFileUrl = Cloudinary::upload($file)->getSecurePath();
+            $user_info->avatar_src = $uploadedFileUrl;
+            $user_info->save();
+            return response()->json([
+                'message' => 'update avatar success',
+                'user' => $user->load('user_info'),
+            ], 200);
         }
         return response()->json([
             'message' => 'upload file failed',
@@ -131,7 +126,7 @@ class AuthController extends Controller
 
     public function update_info(Request $request)
     {
-        try {
+        try{
             $user = auth()->user();
             $user_info = null;
             if ($user->user_info === null) {
@@ -139,10 +134,10 @@ class AuthController extends Controller
             } else {
                 $user_info = $user->user_info()->first();
             }
-            if ($request->name !== null) {
+            if($request->name !== null){
                 $user->name = $request->name;
             }
-            $user_info->gender = $request->gender;
+            $user_info->gender = $request->gender ;
             $user_info->birthday = $request->birthday ? now()->createFromFormat('Y-m-d', $request->birthday) : null;
             $user_info->address = $request->address;
             $user_info->phone = $request->phone;
@@ -152,7 +147,8 @@ class AuthController extends Controller
                 'message' => 'update info success',
                 'user' => $user->load('user_info'),
             ], 200);
-        } catch (Exception $e) {
+        }
+        catch(Exception $e){
             return response()->json([
                 'message' => 'update info failed',
             ], 200);
