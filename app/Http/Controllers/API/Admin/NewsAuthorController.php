@@ -120,12 +120,12 @@ class NewsAuthorController extends Controller
     public function upload_news(Request $request)
     {
         $user = auth()->user();
-        // if ($request->hasFile('title_img')) {
-        //     $uploadedFileUrl = Cloudinary::upload($request->file('title_img')->getRealPath())->getSecurePath();
-        // }
+        if ($request->hasFile('title_img')) {
+            $uploadedFileUrl = Cloudinary::upload($request->file('title_img')->getRealPath())->getSecurePath();
+        }
         $news = new News;
         $news->title = $request->title;
-        $news->title_img = "";
+        $news->title_img = $uploadedFileUrl;
         $news->summary = $request->summary;
         $news->html_content = $request->content;
         $news->date_publish = now();
