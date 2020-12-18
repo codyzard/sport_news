@@ -6,12 +6,12 @@ use App\Http\Controllers\API\Admin\CategoryController as AdminCategoryController
 use App\Http\Controllers\API\Admin\HomepageController;
 use App\Http\Controllers\API\Admin\NewsAuthorController;
 use App\Http\Controllers\API\Admin\NewsController as AdminNewsController;
-use App\Http\Controllers\API\Admin\UserController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\NewsController;
 use App\Http\Controllers\API\TagController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\Admin\SchedulerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,6 +89,9 @@ Route::group([
 Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
     //homepage 
     Route::get('category_with_amount_of_news', [HomepageController::class, 'category_with_amount_of_news']);
+    // manage automation for update;
+    Route::post('set_schedule', [SchedulerController::class, 'set_schedule']);
+    Route::get('get_schedule', [SchedulerController::class, 'get_schedule']);
     // manage category
     Route::apiResource('categories', AdminCategoryController::class);
     Route::post('search_categories', [AdminCategoryController::class, 'search_categories']);
