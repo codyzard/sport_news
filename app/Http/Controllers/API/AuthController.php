@@ -111,10 +111,14 @@ class AuthController extends Controller
             } else {
                 $user_info = $user->user_info()->first();
             }
+           try{
             $uploadedFileUrl = Cloudinary::upload($file, array(
                 "resource_type" => "image",
                 "upload_preset" => "yzqbrnqm"
             ))->getSecurePath();
+           }catch(Exception $e){
+               return $e->getMessage();
+           }
             $user_info->avatar_src = $uploadedFileUrl;
             $user_info->save();
             return response()->json([
