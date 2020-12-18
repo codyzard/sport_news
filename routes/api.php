@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\Admin\AdminApprovalNewsController;
 use App\Http\Controllers\API\Admin\AuthorAccountController;
 use App\Http\Controllers\API\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\API\Admin\HomepageController;
 use App\Http\Controllers\API\Admin\NewsAuthorController;
 use App\Http\Controllers\API\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\API\Admin\UserController;
@@ -86,6 +87,8 @@ Route::group([
 
 // Admin
 Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
+    //homepage 
+    Route::get('category_with_amount_of_news', [HomepageController::class, 'category_with_amount_of_news']);
     // manage category
     Route::apiResource('categories', AdminCategoryController::class);
     Route::post('search_categories', [AdminCategoryController::class, 'search_categories']);

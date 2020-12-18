@@ -110,14 +110,14 @@ class Vikinggg
                             //get img content
                             $GLOBALS['had_news_image'] = false;
                             $GLOBALS['images'] = [];
-                            $detail_crawler->filter('#content-core img')->each(function (Crawler $node) {
+                            $detail_crawler->filter('#content-core img')->each(function (Crawler $node) use ($category) {
                                 $src = $node->attr('src');
                                 if ($GLOBALS['had_news_image'] === true) return;
                                 else {
                                     if (Image::where(['src' => $src])->first() === null) {
                                         $image = Image::create([
                                             'src' => $node->attr('src'),
-                                            'description' =>  'PUBG',
+                                            'description' =>  $category,
                                         ]);
                                         array_push($GLOBALS['images'], $image);
                                     } else {
