@@ -27,7 +27,6 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $time = Scheduler::all()->first();
-        dd($time->time);
         if ($time !== null) {
             $schedule->command('scrape:crawl')->cron($time->time)->withoutOverlapping();
         }
