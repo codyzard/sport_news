@@ -111,14 +111,15 @@ class AuthController extends Controller
             } else {
                 $user_info = $user->user_info()->first();
             }
-            $uploadedFileUrl = Cloudinary::upload($file, array(
-                "resource_type" => "image",
-                "upload_preset" => "yzqbrnqm"
-            ))->getSecurePath();
             return response()->json([
                 'message' => 'update avatar success',
                 'user' => $user->load('user_info'),
             ], 200);
+            $uploadedFileUrl = Cloudinary::upload($file, array(
+                "resource_type" => "image",
+                "upload_preset" => "yzqbrnqm"
+            ))->getSecurePath();
+            
             $user_info->avatar_src = $uploadedFileUrl;
             $user_info->save();
             return response()->json([
