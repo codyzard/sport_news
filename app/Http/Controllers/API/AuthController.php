@@ -8,6 +8,7 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -111,8 +112,10 @@ class AuthController extends Controller
             } else {
                 $user_info = $user->user_info()->first();
             }
+            // $path = Storage::putFileAs('avatar/'.$user->id, $request->file('file'), $request->file('file')->getClientOriginalName());
+            // $user_info->avatar_src = Storage::cloud()->temporaryUrl($path, now()->addMinutes(60));
             $uploadedFileUrl = Cloudinary::upload($file)->getSecurePath();
-            $user_info->avatar_src = $uploadedFileUrl;
+            $user_info->avatar_src  = $uploadedFileUrl;
             $user_info->save();
             return response()->json([
                 'message' => 'update avatar success',
