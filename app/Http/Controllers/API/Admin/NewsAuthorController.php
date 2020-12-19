@@ -121,11 +121,12 @@ class NewsAuthorController extends Controller
     {
         $user = auth()->user();
         if ($request->hasFile('title_img')) {
-            $uploadedFileUrl = Cloudinary::upload($request->file('title_img')->getRealPath())->getSecurePath();
+            // $uploadedFileUrl = Cloudinary::upload($request->file('title_img')->getRealPath())->getSecurePath();
         }
         $news = new News;
         $news->title = $request->title;
-        $news->title_img = $uploadedFileUrl;
+        // $news->title_img = $uploadedFileUrl;
+        $news->title_img = "https://res.cloudinary.com/dq4wah8x3/image/upload/v1607436633/g7i3ec6emxfj8kqr34cs.jpg";
         $news->summary = $request->summary;
         $news->html_content = $request->content;
         $news->date_publish = now();
